@@ -16,7 +16,7 @@ public static class Global {
 	public static Vector3 BstaticPosition = new Vector3( 0 , 0 , 0 );
 	public static Vector3 BHeroPosition = new Vector3( 0 , 0 , 0 );
 	public static Vector3 BCameraPosition = new Vector3( 0 , 0 , -1f );
-	public static Vector3 BCursorPosition = new Vector3( 0 , 0 , -0.75f );
+	public static Vector3 BCursorPosition = new Vector3( 0 , 0 , -0.70f );
 	public static Vector3 BHeroArmOff = new Vector3( 0 , 0 , 0.5f );
 	public static Vector3 BEffecPosition = new Vector3( 0 , 0 , -0.5f );
 	public static Vector3 BTextPosition = new Vector3( 0 , -2.35f , 0f );
@@ -63,10 +63,18 @@ public static class Global {
 	public static Dictionary<string,string> CursorDict
 	= new Dictionary<string, string> {
 		{"Free" , "Tool/Prefab/CursorFree"},
-		{"PointCW" , "Tool/Prefab/CursorCW"},
-		{"PointACW" , "Tool/Prefab/CursorACW"},
+//		{"PointCW" , "Tool/Prefab/CursorCW"},
+//		{"PointACW" , "Tool/Prefab/CursorACW"},
+		{"PointCW" , "Tool/Prefab/CursorFree"},
+		{"PointACW" , "Tool/Prefab/CursorFree"},
+
 		{"PointCatch" , "Tool/Prefab/CursorCatch"},
 		{"None", ""}};
+
+	
+	public static Dictionary<string,string> nextLevelDict
+	= new Dictionary<string, string> {
+		{"level0" , "KafakaLv0_2"}};
 
 
 	public static float EffectDestroyTime = 5f;

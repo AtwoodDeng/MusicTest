@@ -28,4 +28,6 @@ public enum EventDefine{
 
 	OnFreezen,
 	OnUnfreezen,
+
+	OnFrontMenuBack,
 }
