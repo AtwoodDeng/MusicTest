@@ -39,7 +39,7 @@ public class Mouse : MonoBehaviour {
 	}
 	public void Destory()
 	{
-		Invoke("DestoryFinnal",0.1f);
+		Invoke("DestoryFinnal",1.5f);
 	}
 	public void DestoryFinnal()
 	{

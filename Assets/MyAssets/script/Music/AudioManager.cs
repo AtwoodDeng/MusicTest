@@ -29,6 +29,8 @@ public class AudioManager : MonoBehaviour {
 	public double minPluseIntervalTime = 0.2f;
 	private DateTime lastPluseTime ;
 
+	public static float staticZ = 50f;
+
 	void Start () {
 
 		if ( AudioManager.instance == null )
@@ -37,7 +39,7 @@ public class AudioManager : MonoBehaviour {
 		}
 
 		//string path = EditorUtility.OpenFilePanel( "choose a music" , "" , "ogg");
-		string path = "/Users/atwood/tem/matlab/cat.ogg";
+		string path = "/Users/atwood/tem/unitys/MyTest2/Assets/Resources/music/lib.ogg";
 		Debug.Log( "path = " + path );
 
 		if (path.Length != 0) {

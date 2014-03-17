@@ -25,7 +25,7 @@ public class GUIDebug : MonoBehaviour {
 		}
 		types.Add (type);
 		contents.Add (content);
-		Debug.Log ("add");
+		//Debug.Log ("add");
 	}
 
 

@@ -13,39 +13,45 @@ public class BallAI : MonoBehaviour
 		public float directionIntense = 0.1f;
 		public	ParticleSystem particle;
 		public  float emissionTime;
-
+		
 		// Use this for initialization
 		void Start ()
 		{
 				rigidbody.useGravity = false;
 				collider = gameObject.GetComponent<SphereCollider> ();
 				collider.isTrigger = true;
-				particle.enableEmission = false;
-				
-				transform.position.Set (transform.position.x, transform.position.y, 15f);
+				if ( particle )
+					particle.enableEmission = false;
+					
+				transform.localPosition.Set (transform.localPosition.x, transform.localPosition.y, AudioManager.staticZ);
 				
 		}
 	
 		// Update is called once per frame
 		void Update ()
 		{
-				//Debug.Log (getDivertDirection () * getForce ());
-				rigidbody.AddForce ( getDivertDirection () * getForce (), ForceMode.Impulse);
+			Force ();
 		}
 
-		Vector3 getDivertDirection ()
+		void Force()
+		{
+			//Debug.Log (getDivertDirection () * getForce ());
+			rigidbody.AddForce ( getForceDirection ().normalized * getForce (), ForceMode.Impulse);
+		}
+
+		Vector3 getForceDirection ()
 		{
 				Vector3 tempAngel = rigidbody.velocity.normalized;
 				float diffAngel = Random.Range (- Mathf.PI, Mathf.PI);
 				return (tempAngel 
-						+ (new Vector3 (Mathf.Cos (diffAngel), 0, Mathf.Sin (diffAngel))) 
+						+ (new Vector3 (Mathf.Cos (diffAngel), Mathf.Sin (diffAngel) , 0 )) 
 						* directionIntense).normalized;
 		}
 
-		Vector3 getRandomDirection ()
+		Vector3 getPulseDirection ()
 		{
 			float diffAngel = Random.Range (- Mathf.PI, Mathf.PI);
-			return  (new Vector3 (Mathf.Cos (diffAngel), 0, Mathf.Sin (diffAngel) ) ).normalized;
+			return  (new Vector3 (Mathf.Cos (diffAngel), Mathf.Sin (diffAngel) , 0 ) ).normalized;
 		}
 
 		float getForce ()
@@ -56,7 +62,7 @@ public class BallAI : MonoBehaviour
 
 		float getPulse()
 		{
-		return pulseIntense;
+			return pulseIntense;
 		}
 
 		void OnGUI ()
@@ -69,17 +75,19 @@ public class BallAI : MonoBehaviour
 		public void OnMusicPulse ()
 		{
 				//Debug.Log ("pulse" + gameObject.name);
-				rigidbody.AddForce (getRandomDirection () * getPulse () , ForceMode.Impulse);
+				rigidbody.AddForce (getPulseDirection () * getPulse () , ForceMode.Impulse);
 				startParticle ();
 				Invoke ("stopParticle", emissionTime);
 		}
 
 		public void startParticle()
 		{
+			if ( particle )
 				particle.enableEmission = true;
 		}
 		public void stopParticle ()
 		{
+		    if ( particle )
 				particle.enableEmission = false;
 		}
 		
