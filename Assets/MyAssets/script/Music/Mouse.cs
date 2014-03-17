@@ -23,6 +23,7 @@ public class Mouse : MonoBehaviour {
 
 	public void DragOn()
 	{
+		Debug.Log ("drag on");
 		trailRender = this.gameObject.GetComponent<TrailRenderer> ();
 		if (trailRender == null)
 		{
