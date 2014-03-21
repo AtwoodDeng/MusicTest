@@ -39,6 +39,10 @@ public class GUIDebug : MonoBehaviour {
 
 		}
 
+		GUILayout.Label (AudioManager.instance.getValue ().ToString());
+		GUI.HorizontalSlider (new Rect (100, 20, 300, 50), 0.05f
+		                     , AudioManager.instance.getValue (), 0.05f - AudioManager.instance.getValue ());
+
 
 	}
 }

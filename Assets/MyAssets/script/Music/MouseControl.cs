@@ -102,7 +102,9 @@ public class MouseControl : MonoBehaviour {
 		Rigidbody rig = obj.GetComponent<Rigidbody> ();
 		if ( rig == null) return;
 		//Debug.Log ("point");
-		rig.AddForce( pointToBall * PointIntense , ForceMode.Impulse );
+		rig.AddForce( pointToBall / pointToBall.magnitude 
+		             // * AudioManager.instance.getFadeValue() 
+		             * PointIntense , ForceMode.Impulse );
 		BallAI ballAI = obj.GetComponent<BallAI> ();
 		if ( ballAI == null ) return;
 		ballAI.stopParticle ();
@@ -115,8 +117,10 @@ public class MouseControl : MonoBehaviour {
 		Rigidbody rig = obj.GetComponent<Rigidbody> ();
 		if ( rig == null ) 
 			return;
-		Debug.Log ("drag");
-		rig.AddForce( ballToPoint * DragIntense , ForceMode.Impulse );
+		//Debug.Log ("drag");
+		rig.AddForce( ballToPoint / ballToPoint.magnitude 
+		             //* AudioManager.instance.getFadeValue() 
+		             * DragIntense , ForceMode.Impulse );
 		BallAI ballAI = obj.GetComponent<BallAI> ();
 		if ( ballAI == null ) return;
 		ballAI.stopParticle ();

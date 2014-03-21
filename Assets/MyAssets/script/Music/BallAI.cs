@@ -35,7 +35,8 @@ public class BallAI : MonoBehaviour
 
 		void Force()
 		{
-			//Debug.Log (getDivertDirection () * getForce ());
+			Debug.Log (getForceDirection ().ToString() + " "  + getForce ().ToString());
+			
 			rigidbody.AddForce ( getForceDirection ().normalized * getForce (), ForceMode.Impulse);
 		}
 
