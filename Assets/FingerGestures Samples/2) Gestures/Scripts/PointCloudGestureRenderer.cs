@@ -23,6 +23,7 @@ public class PointCloudGestureRenderer : MonoBehaviour
     {
         animation.Stop();
         animation.Play();
+
     }
 
     public bool Render( PointCloudGestureTemplate template )

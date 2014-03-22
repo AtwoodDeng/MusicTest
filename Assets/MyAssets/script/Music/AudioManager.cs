@@ -1,12 +1,17 @@
-﻿using UnityEngine;
+﻿
+//#define CLIP_FROM_FILE
+#define CLIP_FROM_SOURCE
+
+using UnityEngine;
 using System.Collections;
 using System;
+#if CLIP_FROM_FILE
 using UnityEditor;
+#endif
 
 [RequireComponent(typeof(AudioSource))]
 public class AudioManager : MonoBehaviour
 {
-
 		public static AudioManager instance;
 		public float tempValue;
 		public int index;
@@ -33,24 +38,25 @@ public class AudioManager : MonoBehaviour
 				if (AudioManager.instance == null) {
 						AudioManager.instance = this;
 				}
-
+#if (CLIP_FROM_FILE)
 				//string path = EditorUtility.OpenFilePanel( "choose a music" , "" , "ogg");
-				//string path = "/Users/atwood/tem/unitys/MyTest2/Assets/Resources/music/lib.ogg";
-				//Debug.Log ("path = " + path);
+				string path = "/Users/atwood/tem/unitys/MyTest2/Assets/Resources/music/lib.ogg";
+				Debug.Log ("path = " + path);
+				if (path.Length != 0) {
+						www = new WWW ("file:///" + path);
+						StartCoroutine (InitClip ());
+				}
+#endif
 
-				//if (path.Length != 0) {
-				//		www = new WWW ("file:///" + path);
-				//		StartCoroutine (InitClip ());
-				//}
-
-				//startTime = System.DateTime.Now;
+#if (CLIP_FROM_SOURCE)
+				StartCoroutine (InitClip ());
+#endif
 				tempTime = System.DateTime.Now;
 				lastPluseTime = System.DateTime.Now;
 				index = 0;
 
 				UnityEngine.Random.seed = startTime.Second * 23 + startTime.Minute * 19 + startTime.Hour * 17;
 
-				//initPulseData ();
 		}
 
 		int pulseStep = 5000;
@@ -139,16 +145,19 @@ public class AudioManager : MonoBehaviour
 		IEnumerator InitClip ( )
 		{
 
-				yield return www;
-
-	
-				//clip = www.audioClip;
-
 				if (source == null) {
 					source = this.gameObject.GetComponent<AudioSource> ();
 				}
-				 
+#if CLIP_FROM_FILE
+				yield return www;
+				clip = www.audioClip;
+				source.clip = clip;
+#endif
+
+#if CLIP_FROM_SOURCE
 				clip = source.clip;
+				yield return null;
+#endif
 
 				clip_chan = clip.channels;
 				clip_samp = clip.samples;
@@ -157,10 +166,9 @@ public class AudioManager : MonoBehaviour
 
 				clip.GetData (clip_data, 0);
 
-		
-				source.clip = clip;
 				source.Play ();
 				startTime = System.DateTime.Now;
+
 				initPulseData ();
 		}
 
@@ -170,6 +178,7 @@ public class AudioManager : MonoBehaviour
 				tempTime = System.DateTime.Now;
 				UpdateValue ();
 				checkAndPulse ();
+				checkLoop ();
 				GUIDebug.add (ShowType.label, "value = " + getValue ());
 		}
 
@@ -233,6 +242,16 @@ public class AudioManager : MonoBehaviour
 				}
 		}
 
+		public void checkLoop()
+		{
+			if ( !source.isPlaying ) {
+				BroadcastMessage ("OnLoopEnd", SendMessageOptions.DontRequireReceiver);
+			Debug.Log("loop");
+				source.Play ();
+				startTime = System.DateTime.Now;
+			}
+		}
+
 		public bool checkPulseValue ()
 		{
 //		DateTime tempTime = System.DateTime.Now;
@@ -253,10 +272,10 @@ public class AudioManager : MonoBehaviour
 //		return false;
 				//Debug.Log ("index: " + index + " pulse data " + pulse_data.Length );
 
-				if (pulse_data != null && pulse_data [index] > 0)
-						return true;
+			if (pulse_data != null && pulse_data [index] > 0)
+				return true;
 
-				return false;
+			return false;
 
 		}
 

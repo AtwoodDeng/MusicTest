@@ -2,11 +2,14 @@
 using System.Collections;
 using System;
 
+
+
 public class MouseControl : MonoBehaviour {
 
 	public GameObject mouseEffectPrefab;
 	public GameObject mouseTriggerPrefab;
 	public GameObject EffectPrefab;
+
 	private GameObject mouseEffectObj;
 	private Mouse mouseEffect;
 	private MouseTrigger mouseTrigger;
@@ -17,6 +20,7 @@ public class MouseControl : MonoBehaviour {
 	public float PointIntense;
 	public float DragIntense;
 
+	static public MouseControl instance;
 
 	public enum MouseState
 	{
@@ -25,13 +29,14 @@ public class MouseControl : MonoBehaviour {
 		Free
 	}
 
-	MouseState state;
+	public MouseState state;
 
 	DateTime mouseStartTime;
 	public float pointSenseTime = 0.2f;
 
-	Vector3 startPos;
-	Vector3 tempPos;
+	public Vector3 startPos;
+	public Vector3 tempPos;
+	public Vector3 pos;
 
 
 
@@ -39,18 +44,22 @@ public class MouseControl : MonoBehaviour {
 	void Start () {
 		mouseTriggerObj = (GameObject) Instantiate (mouseTriggerPrefab);
 		mouseTrigger = mouseTriggerObj.GetComponent<MouseTrigger> ();
+		if (instance == null)
+						instance = this;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		Vector3 dir = ray.direction;
-		Vector3 pos = dir / dir.z * AudioManager.staticZ;
+		 pos = dir / dir.z * AudioManager.staticZ;
 
 		if (mouseEffectObj)
 			mouseEffectObj.transform.localPosition = pos;
 		if (mouseTriggerObj)
 			mouseTriggerObj.transform.localPosition = pos;
+
+		state = MouseState.Free;
 
 		if ( Input.GetMouseButtonDown(0) )
 		{
@@ -59,7 +68,6 @@ public class MouseControl : MonoBehaviour {
 			state = MouseState.Point;
 			mouseEffectObj = (GameObject)Instantiate(mouseEffectPrefab);
 			mouseEffect = mouseEffectObj.GetComponent<Mouse>();
-
 		}
 		if (Input.GetMouseButton(0))
 		{
@@ -73,6 +81,8 @@ public class MouseControl : MonoBehaviour {
 					state = MouseState.Drag;
 					mouseEffect.DragOn();
 					mouseTrigger.EachBall( Drag );
+				}else{
+					state = MouseState.Point;
 				}
 			}
 		}
@@ -91,9 +101,8 @@ public class MouseControl : MonoBehaviour {
 				effect.transform.localPosition = startPos;
 			}
 
-			state = MouseState.Free;
-
 		}
+		GUIDebug.add (ShowType.label, "MouseState " + state);
 	}
 
 	public void Point( GameObject obj )
