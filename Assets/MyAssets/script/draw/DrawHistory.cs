@@ -24,6 +24,7 @@ public class DrawHistory : MonoBehaviour {
 	void Start () {
 		records = new List<List<MouseRecordEntry>> ();
 		mouseEffects = new List<GameObject> ();
+		OnLoopEnd ();
 	}
 
 	void Update(){
@@ -57,18 +58,33 @@ public class DrawHistory : MonoBehaviour {
 		Vector3 pos = MouseControl.instance.pos;
 		MouseControl.MouseState state = MouseControl.instance.state;
 		int index = AudioManager.instance.index;
-	
-		records [tempRecord].Add (new MouseRecordEntry (pos, state, index));
+
+		if ( tempRecord < 0 || tempRecord >= records.Count )
+			Debug.LogError ("temp record > records  count " + tempRecord + " " + records.Count);
+		else 
+			records [tempRecord].Add (new MouseRecordEntry (pos, state, index));
 	}
 	public void Check()
 	{
 		if (records [tempRecord].Count <= checkStep+1 ) 
 						return;
-
+		//check the record step
+		MouseControl.MouseState s1 = records [tempRecord] [records [tempRecord].Count - 1].state;
+		MouseControl.MouseState s2 = records [tempRecord] [records [tempRecord].Count - 1-checkStep].state;
+		if (s1 == MouseControl.MouseState.Free || s2 == MouseControl.MouseState.Free)
+						return;
+		//two recored position
 		Vector3 p1 = records [tempRecord][records [tempRecord].Count-1].pos;
 		Vector3 p2 = records [tempRecord][records [tempRecord].Count-1-checkStep].pos;
+
 		for ( int i = 0 ; i < tempRecord ; ++ i )
 		{
+			
+			MouseControl.MouseState s3 = records[i][showIndexs[i]].state;
+			MouseControl.MouseState s4 = records[i][showIndexs[i]-checkStep].state;
+			if ( s3 == MouseControl.MouseState.Free || s4 == MouseControl.MouseState.Free )
+				continue;
+
 			if ( showIndexs[i]-checkStep < 0 || records[i].Count <= showIndexs[i] )
 				continue;
 			Vector3 p3 = records[i][showIndexs[i]].pos;
@@ -76,7 +92,10 @@ public class DrawHistory : MonoBehaviour {
 			Vector3 cross = CheckPointCross( p1 , p2 , p3 , p4 );
 			if ( cross == Vector3.zero )
 				continue;
+
 			Debug.Log("cross!!");
+
+
 			GameObject effect = (GameObject)Instantiate(crossEffectPrefabs);
 			effect.transform.parent = this.transform;
 			effect.transform.localPosition = cross;
@@ -134,26 +153,36 @@ public class DrawHistory : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// show the i th record of mouse move
+	/// </summary>
+	/// <param name="i">The index.</param>
 	public void Show( int i )
 	{
 		Debug.Log ("show " + i);
+		//check if there are mouseEffect to show this record
+		if ( mouseEffects [i] == null )
+		{
+			return ;
+		}
+
 		int j = showIndexs [i];
+		//check the world's index( the index of the music)
 		int tempAudioIndex = AudioManager.instance.index;
 		if (j >= records [i].Count - 1 )
 						j = records [i].Count - 1;
 
 		GUIDebug.add (ShowType.label, "show " + i + " index " + records [i] [j].index);
+		//set j to be the index of the record to show
 		while ( j < records[i].Count && tempAudioIndex > records[i][j].index )
 		{
 			j++;
 		}
 		showIndexs [i] = j;
 
-		if ( mouseEffects [i] == null )
-		{
-			return ;
-		}
 		mouseEffects [i].SetActive (true);
+
+		//TODO for debug
 		//Debug.Log ("record " + i + j + " " + records [i] [j].pos);
 		if (i >= mouseEffects.Count)
 						Debug.Log (" error 1 ");
@@ -161,6 +190,9 @@ public class DrawHistory : MonoBehaviour {
 						Debug.Log ("error 2 ");
 		if (j >= records [i].Count)
 						Debug.Log ("error 3 ");
+		/////
+
+		//set the mouse effect to the recorded position
 		mouseEffects [i].transform.localPosition = records [i] [j].pos;
 
 		switch ( records[i][j].state )
