@@ -34,8 +34,9 @@ public class PointCloudGestureRenderer : MonoBehaviour
         lineRenderer.SetVertexCount( template.PointCount );
 
         for( int i = 0; i < template.PointCount; ++i )
+		{
             lineRenderer.SetPosition( i, template.GetPosition( i ) );
-
+		}
         return true;
     }
 }

@@ -28,8 +28,17 @@ public class MouseControl : MonoBehaviour {
 		Drag,
 		Free
 	}
-
 	public MouseState state;
+
+	public enum MouseFollowMethod
+	{
+		Immediately,
+		Delay,
+		LimitSpeed
+	}
+	public MouseFollowMethod followMethod;
+	public float delayIntense = 0.5f;
+	public float limitSpeed = 0.1f;
 
 	DateTime mouseStartTime;
 	public float pointSenseTime = 0.2f;
@@ -54,8 +63,38 @@ public class MouseControl : MonoBehaviour {
 		Vector3 dir = ray.direction;
 		 pos = dir / dir.z * AudioManager.staticZ;
 
-		if (mouseEffectObj)
-			mouseEffectObj.transform.localPosition = pos;
+		if ( mouseEffectObj)
+		{
+		if ( followMethod == MouseFollowMethod.Immediately)
+		{
+			if ( state == MouseState.Drag || state == MouseState.Point)
+				mouseEffectObj.transform.localPosition = pos;
+		}else if( followMethod == MouseFollowMethod.Delay )
+		{
+			if ( state == MouseState.Drag || state == MouseState.Point )
+			if ( mouseEffectObj.transform.localPosition == Vector3.zero )
+			{
+				mouseEffectObj.transform.localPosition = pos;
+			}else
+			{
+				mouseEffectObj.transform.localPosition = 
+					delayIntense * mouseEffectObj.transform.localPosition
+						+ ( 1 - delayIntense ) * pos;
+			}
+
+		}else if ( followMethod == MouseFollowMethod.LimitSpeed )
+		{
+			if ( state == MouseState.Drag || state == MouseState.Point)
+			{
+				Vector3 toward = - mouseEffect.transform.localPosition + pos;
+				if ( toward.magnitude > limitSpeed )
+					toward = toward.normalized * limitSpeed;
+				mouseEffectObj.transform.localPosition =
+					mouseEffectObj.transform.localPosition + toward;
+			}
+		}
+		}
+
 		if (mouseTriggerObj)
 			mouseTriggerObj.transform.localPosition = pos;
 
@@ -68,6 +107,7 @@ public class MouseControl : MonoBehaviour {
 			state = MouseState.Point;
 			mouseEffectObj = (GameObject)Instantiate(mouseEffectPrefab);
 			mouseEffect = mouseEffectObj.GetComponent<Mouse>();
+			mouseEffectObj.transform.localPosition = Vector3.zero;
 		}
 		if (Input.GetMouseButton(0))
 		{

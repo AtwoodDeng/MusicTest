@@ -21,9 +21,9 @@ public class AudioManager : MonoBehaviour
 		private float[] clip_data;
 		private float[] pulse_data;
 		private float[] fade_data;
-		private int clip_freq;
-		private int clip_samp;
-		private int clip_chan;
+		public int clip_freq;
+		public int clip_samp;
+		public int clip_chan;
 		private DateTime startTime;
 		private DateTime tempTime;
 		private WWW www;
@@ -254,23 +254,6 @@ public class AudioManager : MonoBehaviour
 
 		public bool checkPulseValue ()
 		{
-//		DateTime tempTime = System.DateTime.Now;
-//		if ( ( tempTime - lastPluseTime ).TotalSeconds < minPluseIntervalTime )
-//			return false;
-//
-//		int range = 1000;
-//		float[] squreValue = new float[4];
-//		squreValue[0] = GetAverageSqureValue( index - range , range );
-//		squreValue[1] = GetAverageSqureValue( index , range );
-//		squreValue[2] = GetAverageSqureValue( index + range , range );
-//		squreValue[3] = GetAverageSqureValue( index + 2 * range , range );
-//		float pulseValue = ( -3 * squreValue[0]  - squreValue[1] + squreValue[2] + 3 * squreValue[3]) ;
-//
-//		if (pluseThreshold < pulseValue)
-//			return true;
-//
-//		return false;
-				//Debug.Log ("index: " + index + " pulse data " + pulse_data.Length );
 
 			if (pulse_data != null && pulse_data [index] > 0)
 				return true;

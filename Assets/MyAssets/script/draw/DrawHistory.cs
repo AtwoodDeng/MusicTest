@@ -18,7 +18,11 @@ public class DrawHistory : MonoBehaviour {
 
 	//cross
 	public int checkStep = 5;
-	public 
+
+	//gesture
+	string tempGestureName;
+	int tempGestureIndex;
+	public float gestureRecordTime = 0.2f;
 
 	// Use this for initialization
 	void Start () {
@@ -31,6 +35,7 @@ public class DrawHistory : MonoBehaviour {
 		Record ();
 		Show ();
 		Check();
+		CheckGesture ();
 	}
 
 	public void OnLoopEnd()
@@ -40,15 +45,22 @@ public class DrawHistory : MonoBehaviour {
 		showIndexs = new List<int> ();
 		for (int i = 0; i < tempRecord + 1 ; ++i)
 						showIndexs.Add(0);
-		mouseEffects.Clear ();
+		foreach ( GameObject effect in mouseEffects )
+		{
+			if ( effect !=null && effect.GetComponent<Mouse>()!=null )
+				effect.GetComponent<Mouse>().Destory();
+		}
 		for ( int i = 0 ; i < tempRecord ; ++ i )
 		{
 			GameObject effect = (GameObject)Instantiate(mouseEffectPrefabs[i]);
 			effect.transform.parent = this.gameObject.transform;
+			effect.transform.localPosition = Vector3.zero;
 			mouseEffects.Add( effect );
 
 		}
 		records.Add (new List<MouseRecordEntry> ());
+		tempGestureName = null;
+		tempGestureIndex = 0;
 
 		Debug.Log ("History loop end ");
 	}
@@ -59,10 +71,24 @@ public class DrawHistory : MonoBehaviour {
 		MouseControl.MouseState state = MouseControl.instance.state;
 		int index = AudioManager.instance.index;
 
-		if ( tempRecord < 0 || tempRecord >= records.Count )
-			Debug.LogError ("temp record > records  count " + tempRecord + " " + records.Count);
+		if ( tempRecord < 0)
+		{
+
+		}
+		else if( tempRecord >= records.Count )
+		{
+			//Debug.LogError ("temp record > records  count " + tempRecord + " " + records.Count);
+			
+		}
 		else 
-			records [tempRecord].Add (new MouseRecordEntry (pos, state, index));
+		{
+
+			if ( (index - tempGestureIndex ) > gestureRecordTime * AudioManager.instance.clip_freq )
+			{
+				tempGestureName = null;
+			}
+			records [tempRecord].Add (new MouseRecordEntry (pos, state, index, tempGestureName ));
+		}
 	}
 	public void Check()
 	{
@@ -73,20 +99,22 @@ public class DrawHistory : MonoBehaviour {
 		MouseControl.MouseState s2 = records [tempRecord] [records [tempRecord].Count - 1-checkStep].state;
 		if (s1 == MouseControl.MouseState.Free || s2 == MouseControl.MouseState.Free)
 						return;
-		//two recored position
+		//two recorded position
 		Vector3 p1 = records [tempRecord][records [tempRecord].Count-1].pos;
 		Vector3 p2 = records [tempRecord][records [tempRecord].Count-1-checkStep].pos;
 
 		for ( int i = 0 ; i < tempRecord ; ++ i )
 		{
-			
+			//check the effectiveness of the index
+			if ( showIndexs[i]-checkStep < 0 || records[i].Count <= showIndexs[i] )
+				continue;
+
+			//check if the record is available
 			MouseControl.MouseState s3 = records[i][showIndexs[i]].state;
 			MouseControl.MouseState s4 = records[i][showIndexs[i]-checkStep].state;
 			if ( s3 == MouseControl.MouseState.Free || s4 == MouseControl.MouseState.Free )
 				continue;
 
-			if ( showIndexs[i]-checkStep < 0 || records[i].Count <= showIndexs[i] )
-				continue;
 			Vector3 p3 = records[i][showIndexs[i]].pos;
 			Vector3 p4 = records[i][showIndexs[i]-checkStep].pos;
 			Vector3 cross = CheckPointCross( p1 , p2 , p3 , p4 );
@@ -102,6 +130,24 @@ public class DrawHistory : MonoBehaviour {
 		}
 
 	}
+	public void CheckGesture()
+	{
+		for ( int i = 0 ; i < tempRecord ; ++ i )
+		{
+			if ( i >= records.Count )
+				break;
+			if ( records[i][showIndexs[i]].gestureName != null )
+			{
+				Debug.Log("identify a guesture in history " + records[i][showIndexs[i]].gestureName );
+				if ( this.gameObject.GetComponent<PointCloudGestureSample>() )
+					this.gameObject.GetComponent<PointCloudGestureSample>().OnCustomGesture(records[i][showIndexs[i]].gestureName);                                                            
+			}else
+			{
+			}
+		}
+	}
+
+
 	public Vector3 CheckPointCross( Vector3 v1 , Vector3 v2 , Vector3 v3 , Vector3 v4 )
 	{
 		if (v1 == v2 || v3 == v4) // can not be line
@@ -147,7 +193,7 @@ public class DrawHistory : MonoBehaviour {
 	}
 	public void Show()
 	{
-		for (int i = 0 ; i < tempRecord ; ++ i) 
+		for (int i = 0 ; i < tempRecord && i < records.Count ; ++ i) 
 		{
 			Show (i);
 		}
@@ -160,12 +206,6 @@ public class DrawHistory : MonoBehaviour {
 	public void Show( int i )
 	{
 		Debug.Log ("show " + i);
-		//check if there are mouseEffect to show this record
-		if ( mouseEffects [i] == null )
-		{
-			return ;
-		}
-
 		int j = showIndexs [i];
 		//check the world's index( the index of the music)
 		int tempAudioIndex = AudioManager.instance.index;
@@ -173,12 +213,49 @@ public class DrawHistory : MonoBehaviour {
 						j = records [i].Count - 1;
 
 		GUIDebug.add (ShowType.label, "show " + i + " index " + records [i] [j].index);
+		
+		
 		//set j to be the index of the record to show
 		while ( j < records[i].Count && tempAudioIndex > records[i][j].index )
 		{
 			j++;
 		}
 		showIndexs [i] = j;
+
+		//check if there are mouseEffect to show this record
+		switch ( records[i][j].state )
+		{
+		case MouseControl.MouseState.Drag:
+			if ( mouseEffects[i] == null )
+			{	
+				mouseEffects[i] = (GameObject)Instantiate(mouseEffectPrefabs[i]);
+				mouseEffects[i].transform.parent = this.gameObject.transform;
+				mouseEffects[i].transform.localPosition = Vector3.zero;
+			}
+			break;
+		case MouseControl.MouseState.Point:
+			if ( mouseEffects[i] == null )
+			{	
+				mouseEffects[i] = (GameObject)Instantiate(mouseEffectPrefabs[i]);
+				mouseEffects[i].transform.parent = this.gameObject.transform;
+				mouseEffects[i].transform.localPosition = Vector3.zero;
+
+			}
+			break;
+		case MouseControl.MouseState.Free:
+			if ( mouseEffects[i] != null )
+			{
+				if ( mouseEffects[i].GetComponent<Mouse>() )
+					mouseEffects[i].GetComponent<Mouse>().Destory();
+				mouseEffects[i] = null;
+				return;
+			}else
+				return;
+			break;
+		default:
+			return ;
+			break;
+		}
 
 		mouseEffects [i].SetActive (true);
 
@@ -193,31 +270,52 @@ public class DrawHistory : MonoBehaviour {
 		/////
 
 		//set the mouse effect to the recorded position
-		mouseEffects [i].transform.localPosition = records [i] [j].pos;
 
-		switch ( records[i][j].state )
+		if ( MouseControl.instance.followMethod == MouseControl.MouseFollowMethod.Immediately)
 		{
-		case MouseControl.MouseState.Drag:
-			mouseEffects[i].SetActive(true);
-			break;
-		case MouseControl.MouseState.Point:
-			mouseEffects[i].SetActive(true);
-			break;
-		case MouseControl.MouseState.Free:
-			mouseEffects[i].SetActive(false);
-			break;
+			if (mouseEffects [i])
+				mouseEffects [i].transform.localPosition = records [i] [j].pos;
+		}else if( MouseControl.instance.followMethod == MouseControl.MouseFollowMethod.Delay )
+		{
+			if ( mouseEffects [i].transform.localPosition == Vector3.zero )
+			{
+				mouseEffects [i].transform.localPosition = records [i] [j].pos;
+			}else
+			{
+				mouseEffects [i].transform.localPosition = 
+					MouseControl.instance.delayIntense * mouseEffects [i].transform.localPosition
+						+ ( 1 - MouseControl.instance.delayIntense ) * records [i] [j].pos;
+			}
+			
+		}else if ( MouseControl.instance.followMethod == MouseControl.MouseFollowMethod.LimitSpeed )
+		{
+			Vector3 toward = - mouseEffects[i].transform.localPosition + records [i] [j].pos;
+			if ( toward.magnitude > MouseControl.instance.limitSpeed )
+				toward = toward.normalized * MouseControl.instance.limitSpeed ;
+			mouseEffects[i].transform.localPosition =
+				mouseEffects[i].transform.localPosition + toward;
 		}
+
+	}
+
+	void OnCustomGesture( PointCloudGesture gesture )
+	{
+		tempGestureName = gesture.RecognizedTemplate.name;
+		tempGestureIndex = AudioManager.instance.index;
+		Debug.Log ("History OnCustomGesture " + gesture.RecognizedTemplate.name );
 	}
 
 	public class MouseRecordEntry{
 		public Vector3 pos;
 		public MouseControl.MouseState state;
 		public int index;
-		public MouseRecordEntry( Vector3 _pos , MouseControl.MouseState _state , int _index  )
+		public string gestureName ;
+		public MouseRecordEntry( Vector3 _pos , MouseControl.MouseState _state , int _index , string _gesName )
 		{
 			pos = _pos;
 			state = _state;
 			index = _index;
+			gestureName = _gesName;
 		}
 	}
 }

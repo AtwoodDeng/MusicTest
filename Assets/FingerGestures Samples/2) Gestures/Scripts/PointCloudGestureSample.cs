@@ -11,8 +11,10 @@ public class PointCloudGestureSample : SampleBase
     public float GestureScale = 8.0f;
     public Vector2 GestureSpacing = new Vector2( 1.25f, 1.0f );
     public int MaxGesturesPerRaw = 2;
+	public Vector3 GestureRootPos ;
+	public static int[] OrderList = {2,1,3,0,4};
 
-    List<PointCloudGestureRenderer> gestureRenderers;
+    List<MyGestureRender> gestureRenderers;
     
     protected override void Start()
     {
@@ -23,16 +25,67 @@ public class PointCloudGestureSample : SampleBase
     // Message send by the PointCloudRecognizer when it recognized a valid gesture pattern
     void OnCustomGesture( PointCloudGesture gesture )
     {
-        string scorePercentText = ( gesture.MatchScore * 100 ).ToString( "N2" );
-
-        UI.StatusText = "Matched " + gesture.RecognizedTemplate.name + " (score: " + scorePercentText + "% distance:" + gesture.MatchDistance.ToString( "N2" ) + ")";
-        Debug.Log( UI.StatusText );
-
-        // make the corresponding gesture visualizer blink
-        PointCloudGestureRenderer gr = FindGestureRenderer( gesture.RecognizedTemplate );
-        if( gr )
-            gr.Blink();
+		OnCustomGesture (gesture.RecognizedTemplate.name);
+//        string scorePercentText = ( gesture.MatchScore * 100 ).ToString( "N2" );
+//
+//        UI.StatusText = "Matched " + gesture.RecognizedTemplate.name + " (score: " + scorePercentText + "% distance:" + gesture.MatchDistance.ToString( "N2" ) + ")";
+//        Debug.Log( UI.StatusText );
+//
+//        // make the corresponding gesture visualizer blink
+//        MyGestureRender gr = FindGestureRenderer( gesture.RecognizedTemplate );
+//		Debug.Log ("find : " + gr);
+//        if( gr )
+//            gr.Blink();
     }
+
+	public void OnCustomGesture( string name )
+	{
+
+		//string scorePercentText = ( gesture.MatchScore * 100 ).ToString( "N2" );
+		
+		//UI.StatusText = "Matched " + gesture.RecognizedTemplate.name + " (score: " + scorePercentText + "% distance:" + gesture.MatchDistance.ToString( "N2" ) + ")";
+		//Debug.Log( UI.StatusText );
+		
+		// make the corresponding gesture visualizer blink
+
+		//Debug.Log ("On Custom Gesture " + name);
+
+		if ( CheckGestureOrder( name ))
+		{
+			MyGestureRender gr = FindGestureRenderer( name );
+			Debug.Log ("find : " + gr);
+			gr.StartParticle();
+		}else
+		{
+			MyGestureRender gr = FindGestureRenderer( name );
+			Debug.Log ("find : " + gr);
+			gr.Blink();
+		}
+	}
+
+	bool CheckGestureOrder( string name )
+	{
+		for( int i = 0 ;i < gestureRenderers.Count ; ++i )
+		{
+			int order = OrderList[i];
+			if ( gestureRenderers[order].getName() == name )
+			{
+				Debug.Log( "Find Gesture! " + name ) ;
+				return true;
+			}else
+			{
+				if ( gestureRenderers[order].isOn() )
+					continue;
+				else
+					{
+					Debug.Log("Error Gesture " + gestureRenderers[order].getName() + " expected but " 
+						          + name + " found " ); 
+					return false;
+					}
+			}
+		}
+		return false;
+	}
 
     void OnFingerDown( FingerDownEvent e ) 
     {
@@ -43,7 +96,7 @@ public class PointCloudGestureSample : SampleBase
 
     void RenderGestureTemplates()
     {
-        gestureRenderers = new List<PointCloudGestureRenderer>();
+        gestureRenderers = new List<MyGestureRender>();
 
         Transform gestureRoot = new GameObject( "Gesture Templates" ).transform;
         gestureRoot.parent = this.transform;
@@ -57,7 +110,8 @@ public class PointCloudGestureSample : SampleBase
         
         foreach( PointCloudGestureTemplate template in recognizer.Templates )
         {
-            PointCloudGestureRenderer gestureRenderer = Instantiate( GestureRendererPrefab, gestureRoot.position, gestureRoot.rotation ) as PointCloudGestureRenderer;
+			//Debug.Log(" a template " + template.name );
+            MyGestureRender gestureRenderer = Instantiate( GestureRendererPrefab, gestureRoot.position, gestureRoot.rotation ) as MyGestureRender;
             gestureRenderer.GestureTemplate = template;
             gestureRenderer.name = template.name;
             gestureRenderer.transform.parent = gestureRoot;
@@ -86,18 +140,30 @@ public class PointCloudGestureSample : SampleBase
         if( rows > 0 )
             rootPos.y -= GestureScale * 0.5f * ( pos.y - GestureSpacing.y );
 
-        gestureRoot.localPosition = rootPos;
-    }
-
-    PointCloudGestureRenderer FindGestureRenderer( PointCloudGestureTemplate template )
+		gestureRoot.localPosition = rootPos;
+		gestureRoot.localPosition += GestureRootPos;
+	}
+	
+	MyGestureRender FindGestureRenderer( PointCloudGestureTemplate template )
     {
         return gestureRenderers.Find( gr => gr.GestureTemplate == template );
     }
+
+	MyGestureRender FindGestureRenderer( string name )
+	{
+		return gestureRenderers.Find( gr => gr.GestureTemplate.name == name );
+	}
 
     protected override string GetHelpText()
     {
         return @"This sample demonstrates how to use the PointCloudGestureRecognizer to recognize custom gestures from a list of templates";
     }
+
+	public void OnLoopEnd()
+	{
+		for (int i = 0; i < gestureRenderers.Count; ++i)
+						gestureRenderers [i].StopParticle ();
+	}
 
     #endregion 
 }
