@@ -2,6 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum HistoryType
+{
+	Music,
+	Level
+}
+
+
 public class DrawHistory : MonoBehaviour {
 
 	public List<GameObject> mouseEffectPrefabs;
@@ -23,6 +30,9 @@ public class DrawHistory : MonoBehaviour {
 	string tempGestureName;
 	int tempGestureIndex;
 	public float gestureRecordTime = 0.2f;
+
+	//type to record history
+	public HistoryType type = HistoryType.Music;
 
 	// Use this for initialization
 	void Start () {
@@ -69,26 +79,26 @@ public class DrawHistory : MonoBehaviour {
 
 		Vector3 pos = MouseControl.instance.pos;
 		MouseControl.MouseState state = MouseControl.instance.state;
-		int index = AudioManager.instance.index;
+		int index = 0;
+		if ( type == HistoryType.Music )
+			index = AudioManager.instance.index;
+		else if ( type == HistoryType.Level )
+			index = LevelManager.instance.getIndex();
 
-		if ( tempRecord < 0)
-		{
+		if (tempRecord < 0) {
 
-		}
-		else if( tempRecord >= records.Count )
-		{
-			//Debug.LogError ("temp record > records  count " + tempRecord + " " + records.Count);
+				} else if (tempRecord >= records.Count) {
+						//Debug.LogError ("temp record > records  count " + tempRecord + " " + records.Count);
 			
-		}
-		else 
-		{
-
-			if ( (index - tempGestureIndex ) > gestureRecordTime * AudioManager.instance.clip_freq )
-			{
-				tempGestureName = null;
-			}
-			records [tempRecord].Add (new MouseRecordEntry (pos, state, index, tempGestureName ));
-		}
+				} else {
+						if (type == HistoryType.Music) {
+								if ((index - tempGestureIndex) > gestureRecordTime * AudioManager.instance.clip_freq) {
+										tempGestureName = null;
+								}
+						}
+					//Debug.Log( "record " + tempRecord + " " + pos + " " + state + " " + index );
+					records [tempRecord].Add (new MouseRecordEntry (pos, state, index, tempGestureName));
+				}
 	}
 	public void Check()
 	{
@@ -123,10 +133,12 @@ public class DrawHistory : MonoBehaviour {
 
 			Debug.Log("cross!!");
 
-
+			if ( crossEffectPrefabs != null )
+			{
 			GameObject effect = (GameObject)Instantiate(crossEffectPrefabs);
 			effect.transform.parent = this.transform;
 			effect.transform.localPosition = cross;
+			}
 		}
 
 	}
@@ -136,7 +148,7 @@ public class DrawHistory : MonoBehaviour {
 		{
 			if ( i >= records.Count )
 				break;
-			if ( records[i][showIndexs[i]].gestureName != null )
+			if ( records[i].Count > showIndexs[i] && records[i][showIndexs[i]].gestureName != null )
 			{
 				Debug.Log("identify a guesture in history " + records[i][showIndexs[i]].gestureName );
 				if ( this.gameObject.GetComponent<PointCloudGestureSample>() )
@@ -205,22 +217,35 @@ public class DrawHistory : MonoBehaviour {
 	/// <param name="i">The index.</param>
 	public void Show( int i )
 	{
-		Debug.Log ("show " + i);
 		int j = showIndexs [i];
 		//check the world's index( the index of the music)
-		int tempAudioIndex = AudioManager.instance.index;
-		if (j >= records [i].Count - 1 )
-						j = records [i].Count - 1;
+		int tempIndex = 0;
+		if ( type == HistoryType.Music )
+		 	tempIndex = AudioManager.instance.index;
+		else if ( type == HistoryType.Level )
+			tempIndex = LevelManager.instance.getIndex();
 
-		GUIDebug.add (ShowType.label, "show " + i + " index " + records [i] [j].index);
-		
-		
+		//GUIDebug.add (ShowType.label, "show " + i + " index " + records [i] [j].index);
+		if (records [i].Count <= 0)
+						return;
+		if (j >= records [i].Count - 1 )
+			j = records [i].Count - 1;
 		//set j to be the index of the record to show
-		while ( j < records[i].Count && tempAudioIndex > records[i][j].index )
+		while ( j < records[i].Count && tempIndex > records[i][j].index )
 		{
 			j++;
 		}
+
 		showIndexs [i] = j;
+		if ( j >= records[i].Count )
+		{
+			if ( mouseEffects[i] != null && mouseEffects[i].GetComponent<Mouse>() != null )
+				mouseEffects[i].GetComponent<Mouse>().Destory();
+			mouseEffects[i] = null;
+			return;
+		}
+
+		//Debug.Log ("show " + i + "index " + j + "state " + records [i] [j].state + " pos " + records [i] [j].pos);
 
 		//check if there are mouseEffect to show this record
 		switch ( records[i][j].state )
@@ -300,9 +325,12 @@ public class DrawHistory : MonoBehaviour {
 
 	void OnCustomGesture( PointCloudGesture gesture )
 	{
-		tempGestureName = gesture.RecognizedTemplate.name;
-		tempGestureIndex = AudioManager.instance.index;
-		Debug.Log ("History OnCustomGesture " + gesture.RecognizedTemplate.name );
+		if ( type == HistoryType.Music )
+		{
+			tempGestureName = gesture.RecognizedTemplate.name;
+			tempGestureIndex = AudioManager.instance.index;
+			Debug.Log ("History OnCustomGesture " + gesture.RecognizedTemplate.name );
+		}
 	}
 
 	public class MouseRecordEntry{
@@ -310,6 +338,7 @@ public class DrawHistory : MonoBehaviour {
 		public MouseControl.MouseState state;
 		public int index;
 		public string gestureName ;
+
 		public MouseRecordEntry( Vector3 _pos , MouseControl.MouseState _state , int _index , string _gesName )
 		{
 			pos = _pos;

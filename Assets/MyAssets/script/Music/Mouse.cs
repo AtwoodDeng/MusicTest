@@ -6,7 +6,7 @@ using Holoville.HOTween;
 public class Mouse : MonoBehaviour {
 
 	TrailRenderer trailRender;
-	bool ifDrag = false;
+	public ParticleSystem particle;
 
 	// Use this for initialization
 	void Start () {
@@ -27,23 +27,33 @@ public class Mouse : MonoBehaviour {
 		trailRender = this.gameObject.GetComponent<TrailRenderer> ();
 		if (trailRender == null)
 		{
-			Debug.Log ("No trail render");
 			return;
 		}
 		trailRender.enabled = true;
-		ifDrag = true;
 	}
 	public void DragOff()
 	{
 		trailRender.enabled = false;
-		ifDrag = false;
 	}
 	public void Destory()
 	{
-		Invoke("DestoryFinnal", trailRender.time );
+		//.Log ("Destory mouse");
+		float trailTime = 0f;
+		float parTime = 0f;
+		if ( particle != null )
+		{
+			parTime = particle.startLifetime;
+			particle.enableEmission = false;
+		}
+		if ( trailRender != null && trailRender.enabled )
+			trailTime = trailRender.time;
+
+		float time = Mathf.Max (parTime, trailTime);
+		Invoke("DestoryFinnal", time );
 	}
 	public void DestoryFinnal()
 	{
-		Destroy(this.gameObject);
+		this.gameObject.transform.position = new Vector3 (99999f, 999999f, 99999f);
+		this.gameObject.SetActive (false);
 	}
 }

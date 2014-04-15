@@ -10,11 +10,13 @@ public class MouseControl : MonoBehaviour {
 	public GameObject mouseTriggerPrefab;
 	public GameObject EffectPrefab;
 
-	private GameObject mouseEffectObj;
+	public GameObject mouseEffectObj;
 	private Mouse mouseEffect;
 	private MouseTrigger mouseTrigger;
 	private GameObject mouse;
 	private GameObject mouseTriggerObj;
+
+	public MyLightColor lightColor;
 
 
 	public float PointIntense;
@@ -105,9 +107,19 @@ public class MouseControl : MonoBehaviour {
 			mouseStartTime = System.DateTime.Now;
 			startPos = pos;
 			state = MouseState.Point;
-			mouseEffectObj = (GameObject)Instantiate(mouseEffectPrefab);
-			mouseEffect = mouseEffectObj.GetComponent<Mouse>();
-			mouseEffectObj.transform.localPosition = Vector3.zero;
+			if ( mouseEffectObj != null )
+			{
+//				if ( mouseEffectObj.GetComponent<Mouse>() != null )
+//					mouseEffectObj.GetComponent<Mouse>().Destory();
+//				else
+//					GameObject.Destroy(mouseEffectObj);
+			}else{
+				mouseEffectObj = (GameObject)Instantiate(mouseEffectPrefab);
+				mouseEffect = mouseEffectObj.GetComponent<Mouse>();
+				mouseEffectObj.transform.parent = transform;
+				mouseEffectObj.transform.localPosition = Vector3.zero;
+				ChangeColorTo( lightColor );
+			}
 		}
 		if (Input.GetMouseButton(0))
 		{
@@ -121,6 +133,7 @@ public class MouseControl : MonoBehaviour {
 					state = MouseState.Drag;
 					mouseEffect.DragOn();
 					mouseTrigger.EachBall( Drag );
+
 				}else{
 					state = MouseState.Point;
 				}
@@ -128,15 +141,20 @@ public class MouseControl : MonoBehaviour {
 		}
 		if (Input.GetMouseButtonUp(0))
 		{
-			if ( mouseEffect != null )
+			if ( mouseEffect != null && mouseEffectObj.GetComponent<Mouse>() != null )
 			{
-				mouseEffect.Destory();
+				if ( mouseEffectObj.GetComponent<PaperLight>() != null )
+					mouseEffectObj.GetComponent<PaperLight>().Destory();
+				else 
+					mouseEffectObj.GetComponent<Mouse>().Destory();
 			}
 			mouseEffect = null;
+			mouseEffectObj = null;
 			if ( state == MouseState.Point )
 			{
 				mouseTrigger.EachBall( Point );
 				GameObject effect = (GameObject)Instantiate( EffectPrefab );
+
 				effect.transform.parent = this.gameObject.transform;
 				effect.transform.localPosition = startPos;
 			}
@@ -174,4 +192,22 @@ public class MouseControl : MonoBehaviour {
 		if ( ballAI == null ) return;
 		ballAI.stopParticle ();
 	}
+
+	public void ChangeColorTo( MyLightColor col )
+	{
+		//Debug.Log ("Mouse control Change color" + col.ToString ());
+		lightColor = col;
+		if ( mouseEffectObj != null )
+		{
+			PaperLight light = mouseEffectObj.GetComponent<PaperLight> ();
+			light.ChangeColorTo (col);
+		}else
+			Debug.Log("Nothing to change ");
+	}
+
+	public void  OnLoopEnd()
+	{
+		ChangeColorTo (MyLightColor.None);
+	}
+
 }
