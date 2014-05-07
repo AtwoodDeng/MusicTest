@@ -32,7 +32,6 @@ public class PaperBoy : MonoBehaviour {
 			if( nearestLight != null )
 				ForceTo(nearestLight.transform.position );
 				//ForceTo( MouseControl.instance.pos );
-			
 		}
 		collider.center = boyBlock.transform.localPosition;
 	}
