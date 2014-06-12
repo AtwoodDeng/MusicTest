@@ -18,7 +18,8 @@ public class HeroHand : MonoBehaviour {
 
 	public HeroBody heroBody;
 	public HeroArm heroArm;
-	public float forceIntense = 1.0f;
+	public float forceIntense = 0.025f;
+	public float toBodyForceRate = 0.33f;
 	public GameObject stayObj;
 	public Vector3 stayPos;
 	public float MaxLength = 100f;
@@ -121,9 +122,21 @@ public class HeroHand : MonoBehaviour {
 		if ( state == HandState.Fly )
 		{
 			state = HandState.Shrink;
+
+			
+			MessageEventArgs msg = new MessageEventArgs();
+			msg.AddMessage( "HandID" , ID.ToString());
+			BEventManager.Instance.PostEvent( EventDefine.OnShrink , msg );
+
 		}else if ( state == HandState.Catch )
 		{
 			state = HandState.Shrink;
+
+			
+			MessageEventArgs msg = new MessageEventArgs();
+			msg.AddMessage( "HandID" , ID.ToString());
+			BEventManager.Instance.PostEvent( EventDefine.OnShrink , msg );
+
 		}
 	}
 
@@ -162,6 +175,12 @@ public class HeroHand : MonoBehaviour {
 			state = HandState.Catch;
 
 			CreateCatchEffect( stayPos );
+
+			
+			MessageEventArgs msg = new MessageEventArgs();
+			msg.AddMessage( "HandID" , ID.ToString());
+			msg.AddMessage( "ForceType", forceType.ToString());
+			BEventManager.Instance.PostEvent( EventDefine.OnCatch , msg );
 		}
 	}
 
@@ -172,7 +191,10 @@ public class HeroHand : MonoBehaviour {
 			GameObject catchEffectTemp = (GameObject)Instantiate( catchEffectPrefab );
 			if ( catchEffectTemp != null )
 			{
-				catchEffectTemp.transform.position = position;
+				catchEffectTemp.transform.parent = BObjManager.Instance.Effect.transform;
+				Vector3 startPos = position;
+				startPos.z = Global.BEffecPosition.z;
+				catchEffectTemp.transform.position = startPos;
 			}else{
 				Debug.Log("Cannot instantiate Catch Effect" );
 			}
@@ -195,12 +217,12 @@ public class HeroHand : MonoBehaviour {
 			else if ( forceType == ForceType.SpinAntiCW )
 			{
 				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
-				force -= forceIntense * toBody ;
+				force -= forceIntense * toBodyForceRate * toBody ;
 				return force;
 			}else if ( forceType == ForceType.SpinCW )
 			{
 				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
-				force -= forceIntense * toBody ;
+				force -= forceIntense * toBodyForceRate * toBody ;
 				return force;
 			}
 		}
@@ -212,7 +234,9 @@ public class HeroHand : MonoBehaviour {
 		if ( state == HandState.Fly )
 		{
 			if ( Global.HandStayTag.Equals( collider.gameObject.tag ))
+			{
 				Catch( collider.gameObject );
+			}
 
 		}else if ( state == HandState.Shrink )
 		{
@@ -226,8 +250,8 @@ public class HeroHand : MonoBehaviour {
 		if ( true )
 		{
 			forceType = type;
-			catchEffectPrefab =  Resources.Load( Global.CatchEffectResourceDict [ type.ToString() ] ) as GameObject;
-			Debug.Log( "[SetForceType] " + Global.CatchEffectResourceDict[ type.ToString() ] );
+			catchEffectPrefab =  Resources.Load( Global.HandCatchEffectDict [ type.ToString() ] ) as GameObject;
+			Debug.Log( "[SetForceType] " + Global.HandCatchEffectDict[ type.ToString() ] );
 			if ( catchEffectPrefab == null )
 			{
 				Debug.Log("Cannot find prefab for " + type.ToString());

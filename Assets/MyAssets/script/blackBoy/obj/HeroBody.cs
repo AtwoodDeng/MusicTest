@@ -10,10 +10,12 @@ public class HeroBody : MonoBehaviour {
 	public GameObject HeroHandPrefab;
 	public GameObject HeroArmPrefab;
 
+
 	public HandGroup leftHandGroup;
-	public HandGroup rightHandGroup;
+	public HandGroup rightHandGroup; 
 	public float throwI = 1.0f;
 	public MeshCollider meshCollider;
+	[HideInInspector]public ParticleSystem catchEffect;
 
 	public float advoidIntense = 1.0f;
 	public float MAXAdvoidForce = 5.0f;
@@ -41,12 +43,12 @@ public class HeroBody : MonoBehaviour {
 				if ( HandsStateAllEqual( HeroHand.HandState.None ))
 					return HandGroupState.None;
 				
-				return HandGroupState.Fly;
+				return HandGroupState.Fly; 
 				
 			}
 			set {
 			}
-		}
+		} 
 		
 		private bool HandsStateAllEqual( HeroHand.HandState state )
 		{
@@ -94,6 +96,16 @@ public class HeroBody : MonoBehaviour {
 			}
 			return force;
 		}
+
+		public HeroHand GetHandByID( int ID )
+		{
+			foreach( HeroHand hand in hands )
+			{
+				if ( hand.ID == ID )
+					return hand;
+			}
+			return null;
+		}
 	}
 
 	void Start()
@@ -110,13 +122,62 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnStrenchHand ,OnStrenchHand );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMoveHand, OnMoveHand);
+//		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
+
 	}
 	
-	void OnDisable() {
+	void OnDisable() { 
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnStrenchHand, OnStrenchHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMoveHand, OnMoveHand);
+//		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
 	}
+//
+//	public void OnCatch(EventDefine eventName, object sender, EventArgs args)
+//	{
+//		MessageEventArgs msg = (MessageEventArgs)args;
+//		HeroHand.ForceType type = HeroHand.ForceType.Pull;
+//		if ( msg.ContainMessage("ForceType")) 
+//		{
+//			type = (HeroHand.ForceType) Enum.Parse( typeof(HeroHand.ForceType) , msg.GetMessage("ForceType"));
+//		}else
+//		{
+//			if ( msg.ContainMessage("HandID"))
+//			{
+//				HeroHand hand = GetHandByID( Convert.ToInt32( msg.GetMessage("HandID")));
+//				type = hand.forceType;
+//			}
+//		}
+//		CreateCatchEffect( type );
+//
+//	}
+//
+//	public void CreateCatchEffect( HeroHand.ForceType type )
+//	{
+//
+//		GameObject catchEffectPrefab = Resources.Load( Global.HeroCatchEffectDict[type.ToString()]) as GameObject;
+//		if ( catchEffectPrefab == null )
+//		{
+//			Debug.Log("Cannot find catch effect prefab " + Global.HeroCatchEffectDict[type.ToString()] );
+//			return;
+//		}
+//		GameObject catchEffectObj = (GameObject)Instantiate( catchEffectPrefab );
+//		if ( catchEffectObj == null )
+//		{
+//			Debug.Log("Cannot instantiate catch effect " + catchEffectPrefab.name);
+//			return;
+//		}
+//		catchEffect.transform.parent = BObjManager.Instance.Effect.transform;
+//		catchEffect.transform.localPosition = Vector3.zero;
+//		BFollowWith followWith = catchEffect.GetComponent<BFollowWith>();
+//		if ( followWith != null )
+//			followWith.UpdateTarget( this.gameObject );
+//
+//
+//
+//	}
+
+		
 	public void OnMoveHand(EventDefine eventName, object sender, EventArgs args)
 	{
 		// Debug.Log("on move hand");
@@ -137,14 +198,20 @@ public class HeroBody : MonoBehaviour {
 		if ( isLeft )
 		{
 			if ( leftHandGroup.state == HandGroup.HandGroupState.Free )
+			{
 				StrenchHandToward(posX , posY , isLeft );
+				ShrinkHand( !isLeft );
+			}
 			else if ( leftHandGroup.state == HandGroup.HandGroupState.Catch )
 				ShrinkHand(isLeft);
-		}else
+		}else 
 		{
 			
 			if ( rightHandGroup.state == HandGroup.HandGroupState.Free )
+			{
 				StrenchHandToward(posX , posY , isLeft );
+				ShrinkHand( !isLeft );
+			}
 			else if ( rightHandGroup.state == HandGroup.HandGroupState.Catch )
 				ShrinkHand(isLeft);
 		}
@@ -184,11 +251,9 @@ public class HeroBody : MonoBehaviour {
 
 	public void StrenchHandToward( float x , float y , bool isLeft )
 	{
-//		Debug.Log("[StrenchHandToward] strech hand pos " + x + " " + y );
-//		Debug.Log("[StrenchHandToward] temp position " + transform.position);
 		Vector3 toward = new Vector3(x ,y ,0) + Global.BstaticPosition - transform.position;
 		Vector3 forceToward = toward.normalized;
-		//Debug.Log("[StrenchHandToward] toward " + forceToward );
+
 		if ( isLeft )
 		{
 			leftHandGroup.Throw( transform.position , forceToward , throwI ); 
@@ -216,6 +281,15 @@ public class HeroBody : MonoBehaviour {
 		}
 	}
 
+	public HeroHand GetHandByID( int ID )
+	{
+		HeroHand hand = leftHandGroup.GetHandByID( ID );
+		if ( hand == null )
+			hand = rightHandGroup.GetHandByID( ID );
+		return hand;
+
+	}
+
 
 	// Update is called once per frame
 	void Update () {
@@ -223,6 +297,11 @@ public class HeroBody : MonoBehaviour {
 		rigidbody.AddForce( leftHandGroup.getForce() + rightHandGroup.getForce() , ForceMode.Impulse );
 		if ( meshCollider )
 			meshCollider.convex =true;
+
+		//adjust
+//		Vector3 pos = transform.position;
+//		pos.z = Global.BHeroPosition.z;
+//		transform.position  = pos ;
 	}
 
 	public Vector3 getArmPos()
@@ -238,13 +317,21 @@ public class HeroBody : MonoBehaviour {
 		Vector3 toward = cloestPoint - transform.position;
 		if ( toward.magnitude < 1e-7 )
 			toward = collider.gameObject.transform.position - transform.position;
-
+		if ( toward.magnitude < 1e-7 )
+			return;
 		Vector3 force = - toward.normalized;
+
 
 		force *= ( 1f / toward.magnitude ) * advoidIntense;
 
 		if ( force.sqrMagnitude > MAXAdvoidForce )
 			force = force.normalized * MAXAdvoidForce;
+
+		force.z = 0 ;
+
+		if ( force.magnitude > 1e20 )
+			return ;
+
 		rigidbody.AddForce( force , ForceMode.Impulse );
 	}
 

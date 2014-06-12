@@ -14,7 +14,9 @@ public enum EventDefine{
 	OnStrenchHand = OnLevelStart+1,
 	OnShrinkHand = OnStrenchHand+1,
 	OnMoveHand = OnShrinkHand+1,
+	OnCatch = OnMoveHand+1,
+	OnShrink = OnCatch+1,
 
 
-	OnMouseClick = OnMoveHand+1,
+	OnMouseClick = OnShrink+1,
 }

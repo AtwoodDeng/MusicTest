@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -13,9 +13,12 @@ public static class Global {
 
 	public static Vector3 staticPosition = new Vector3( 0 , 0 , 50f );
 	public static Vector3 BstaticPosition = new Vector3( 0 , 0 , 0 );
+	public static Vector3 BHeroPosition = new Vector3( 0 , 0 , 0 );
 	public static Vector3 BCameraPosition = new Vector3( 0 , 0 , -1f );
-	public static Vector3 BCursorPosition = new Vector3( 0 , 0 , -0.5f );
+	public static Vector3 BCursorPosition = new Vector3( 0 , 0 , -0.75f );
 	public static Vector3 BHeroArmOff = new Vector3( 0 , 0 , 0.5f );
+	public static Vector3 BEffecPosition = new Vector3( 0 , 0 , -0.5f );
+
 
 
 	public static string HandStayTag = "ROCK" ;
@@ -33,10 +36,16 @@ public static class Global {
 
 	public static string[] CollidableTag = {"ROCK","OUTER"};
 
-	public static Dictionary<string,string> CatchEffectResourceDict
+	public static Dictionary<string,string> HandCatchEffectDict
 		= new Dictionary<string, string> {
+		{"SpinCW" , "Effect/Hero/Dot"},
+		{"SpinAntiCW" , "Effect/Hero/Dot"},
+		{"Pull" , "Effect/Hero/F"}};
+	public static Dictionary<string,string> ArmCatchEffectDict
+	= new Dictionary<string, string> {
 		{"SpinCW" , "Effect/Hero/FeatherCW"},
 		{"SpinAntiCW" , "Effect/Hero/FeatherAntiCW"},
 		{"Pull" , "Effect/Hero/FeatherCW"}};
-	
+
+	public static float EffectDestroyTime = 5f;
 }
