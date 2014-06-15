@@ -13,7 +13,7 @@ public class PInputManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		GUIDebug.add( ShowType.label , Input.GetAxisRaw( "left" ) + " " + Input.GetAxis( "left" )  );
+//		GUIDebug.add( ShowType.label , Input.GetAxisRaw( "left" ) + " " + Input.GetAxis( "left" )  );
 
 		if ( Input.GetAxisRaw( "left" ) == 1 )
 		{

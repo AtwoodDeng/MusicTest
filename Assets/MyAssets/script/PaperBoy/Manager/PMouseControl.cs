@@ -139,7 +139,7 @@ public class PMouseControl : MonoBehaviour {
 //			lightOnMouse = null;
 //			mouseObj = null;
 		}
-		GUIDebug.add (ShowType.label, "MouseState " + state);
+//		GUIDebug.add (ShowType.label, "MouseState " + state);
 	}
 	
 //	public void Point( GameObject obj )

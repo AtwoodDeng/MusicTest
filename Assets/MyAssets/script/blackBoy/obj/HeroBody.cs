@@ -119,7 +119,7 @@ public class HeroBody : MonoBehaviour {
 
 
 	void OnEnable() {
-		BEventManager.Instance.RegisterEvent (EventDefine.OnStrenchHand ,OnStrenchHand );
+//		BEventManager.Instance.RegisterEvent (EventDefine.OnStrenchHand ,OnStrenchHand );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMoveHand, OnMoveHand);
 //		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
@@ -127,7 +127,7 @@ public class HeroBody : MonoBehaviour {
 	}
 	
 	void OnDisable() { 
-		BEventManager.Instance.UnregisterEvent (EventDefine.OnStrenchHand, OnStrenchHand);
+//		BEventManager.Instance.UnregisterEvent (EventDefine.OnStrenchHand, OnStrenchHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMoveHand, OnMoveHand);
 //		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
@@ -203,7 +203,9 @@ public class HeroBody : MonoBehaviour {
 				ShrinkHand( !isLeft );
 			}
 			else if ( leftHandGroup.state == HandGroup.HandGroupState.Catch )
+			{
 				ShrinkHand(isLeft);
+			}
 		}else 
 		{
 			
@@ -213,31 +215,40 @@ public class HeroBody : MonoBehaviour {
 				ShrinkHand( !isLeft );
 			}
 			else if ( rightHandGroup.state == HandGroup.HandGroupState.Catch )
+			{
 				ShrinkHand(isLeft);
+			}
 		}
 	}
 		
-	public void OnStrenchHand(EventDefine eventName, object sender, EventArgs args)
-	{
-		Debug.Log("on strench");
-		MessageEventArgs msg = (MessageEventArgs)args;
-		if ( !msg.ContainMessage("posX") || !msg.ContainMessage("posY") || !msg.ContainMessage("isLeft"))
-		{
-			Debug.Log("cannot find posX and posY");
-			return;
-		}
-		float posX = float.Parse( msg.GetMessage("posX"));
-		float posY = float.Parse( msg.GetMessage("posY"));
-		bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
-		StrenchHandToward(posX , posY,isLeft);
-	}
-
+//	public void OnStrenchHand(EventDefine eventName, object sender, EventArgs args)
+//	{
+//		Debug.Log("on strench");
+//		MessageEventArgs msg = (MessageEventArgs)args;
+//		if ( !msg.ContainMessage("posX") || !msg.ContainMessage("posY") || !msg.ContainMessage("isLeft"))
+//		{
+//			Debug.Log("cannot find posX and posY");
+//			return;
+//		}
+//		float posX = float.Parse( msg.GetMessage("posX"));
+//		float posY = float.Parse( msg.GetMessage("posY"));
+//		bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
+//		StrenchHandToward(posX , posY,isLeft);
+//	}
+//
 	public void OnShrinkHand(EventDefine eventName, object sender, EventArgs args)
 	{
 		Debug.Log("on shring");
 		MessageEventArgs msg = (MessageEventArgs)args;
-		bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
-		ShrinkHand( isLeft );
+		if ( msg.ContainMessage("isLeft"))
+		{
+			bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
+			ShrinkHand( isLeft );
+		}else if ( msg.ContainMessage("HandID"))
+		{
+			int handID = Convert.ToInt32( msg.GetMessage("HandID"));
+			ShrinkHand( handID );
+		}
 	}
 
 	public void ShrinkHand( bool isLeft )
@@ -247,6 +258,11 @@ public class HeroBody : MonoBehaviour {
 			leftHandGroup.Shrink();
 		else
 			rightHandGroup.Shrink();
+	}
+
+	public void ShrinkHand(int handID )
+	{
+		GetHandByID( handID ).Shrink();
 	}
 
 	public void StrenchHandToward( float x , float y , bool isLeft )
@@ -290,11 +306,17 @@ public class HeroBody : MonoBehaviour {
 
 	}
 
+	public Vector3 getForce()
+	{
+		return leftHandGroup.getForce() + rightHandGroup.getForce();
+	}
+
 
 	// Update is called once per frame
 	void Update () {
 		///force 
-		rigidbody.AddForce( leftHandGroup.getForce() + rightHandGroup.getForce() , ForceMode.Impulse );
+		rigidbody.AddForce( getForce() , ForceMode.Impulse );
+
 		if ( meshCollider )
 			meshCollider.convex =true;
 

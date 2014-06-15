@@ -31,4 +31,27 @@ public class BObjManager : MonoBehaviour {
 	}
 	GameObject _Effect;
 
+	public GameObject Hero
+	{
+		get {
+			if (_Hero == null )
+			{
+				_Hero = GameObject.FindGameObjectWithTag("HERO");
+			}
+			return _Hero;
+		}
+	}	
+	GameObject _Hero;
+
+	public HeroBody BHeroBody
+	{
+		get {
+			if (_BHeroBody == null )
+			{
+				_BHeroBody = Hero.GetComponent<HeroBody>();
+			}
+			return _BHeroBody;
+		}
+	}
+	HeroBody _BHeroBody;
 }

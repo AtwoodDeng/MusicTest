@@ -3,19 +3,20 @@ using System.Collections;
 
 public class AutoDestory : MonoBehaviour {
 
-	public float destroyTime = 1f;
+	public float destroyTime = -1;
 
 	public bool isDestroyOnAwake = true;
 
 	// Use this for initialization
 	void Awake () {
-		if ( isDestroyOnAwake )
+		if ( isDestroyOnAwake && destroyTime > 0 )
 			Invoke("DestroyMySelf" , destroyTime );
 	}
 
 	public void StartAutoDestory()
 	{
-		Invoke("DestroyMySelf" , destroyTime );
+		if ( destroyTime > 0 )
+			Invoke("DestroyMySelf" , destroyTime );
 	}
 
 	void DestroyMySelf(){

@@ -3,11 +3,13 @@ using System.Collections;
 
 public class BFollowWith : MonoBehaviour {
 
-	 GameObject target = null;
+	GameObject target = null;
 
 	public enum FollowState{
-		Relatively,
-		At,
+		Relatively,   // put at the target's 
+		HalfRelatively,  
+		HalfAt,   //put between the target's ori position and temp position 
+		At,   //put at the target's position
 
 	}
 
@@ -19,7 +21,7 @@ public class BFollowWith : MonoBehaviour {
 	public enum TargetType{
 		UserDefine,
 		MainCamera,
-
+		Hero,
 	}
 
 	public FollowState followState;
@@ -27,12 +29,19 @@ public class BFollowWith : MonoBehaviour {
 	public TargetType targetType;
 	public bool fixZ = true;
 
-	Vector3 relativePos = Vector3.zero;
-	float moveRate = 0.5f;
+	private Vector3 relativePos = Vector3.zero;
+	private Vector3 targetOriginalPos = Vector3.zero;
+	private Vector3 thisOriginalPos = Vector3.zero;
+	public float RelativelyRate = 1.0f;
+	public float moveRate = 0.5f;
+
 
 	// Use this for initialization
-	void Start () {
-		
+	void Awake () {
+		if ( target != null )
+		{
+			UpdateTarget( target );
+		}
 	}
 	
 	// Update is called once per frame
@@ -44,11 +53,15 @@ public class BFollowWith : MonoBehaviour {
 			case TargetType.MainCamera:
 				UpdateTarget( Camera.main.gameObject );
 				break;
+			case TargetType.Hero:
+				UpdateTarget( BObjManager.Instance.Hero );
+				break;
 			case TargetType.UserDefine:
 				break;
 			default:
 				break;
 			}
+
 		}
 		if ( target != null )
 		{
@@ -60,8 +73,15 @@ public class BFollowWith : MonoBehaviour {
 	public void UpdateTarget( GameObject _target )
 	{
 		target = _target;
-		if ( followState == FollowState.Relatively )
-			relativePos = transform.position -  target.transform.position ;
+		relativePos = transform.position -  target.transform.position ;
+		targetOriginalPos = target.transform.position;
+		thisOriginalPos = transform.position;
+
+//		if ( followState == FollowState.Relatively )
+//			relativePos = transform.position -  target.transform.position ;
+//		else if ( followState == FollowState.HalfAt )
+//			targetOriginalPos = target.transform.position;
+
 	}
 
 	Vector3 GetTargetPosition() 
@@ -70,6 +90,12 @@ public class BFollowWith : MonoBehaviour {
 		{
 		case FollowState.Relatively:
 			return target.transform.position + relativePos;
+		case FollowState.HalfRelatively:
+			Vector3 thisOriToTarTemp = target.transform.position - thisOriginalPos;
+			return thisOriginalPos + thisOriToTarTemp * RelativelyRate;
+		case FollowState.HalfAt:
+			Vector3 targetOriToTemp = target.transform.position - targetOriginalPos;
+			return targetOriginalPos + targetOriToTemp * RelativelyRate;
 		case FollowState.At:
 			return target.transform.position;
 		default:
@@ -93,5 +119,13 @@ public class BFollowWith : MonoBehaviour {
 		default:
 			break;
 		}
+	}
+
+	public void OnBecameVisible()
+	{
+	}
+
+	public void OnBecameInvisible()
+	{
 	}
 }

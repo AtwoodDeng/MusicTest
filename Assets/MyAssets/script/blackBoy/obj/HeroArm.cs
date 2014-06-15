@@ -26,9 +26,9 @@ public class HeroArm : MonoBehaviour {
 			bodyToHand.z = 0 ;
 			Vector3 direction = Vector3.Cross( Vector3.back , bodyToHand );
 
-			GUIDebug.add(ShowType.label , "bth:" + bodyToHand.ToString() +  " direction:" + direction.ToString());
+//			GUIDebug.add(ShowType.label , "bth:" + bodyToHand.ToString() +  " direction:" + direction.ToString());
 			float angle =  Vector3.Angle( new Vector3( 1f , 0, 0 ) , direction );
-			GUIDebug.add(ShowType.label , "Angle " + angle );
+//			GUIDebug.add(ShowType.label , "Angle " + angle );
 			if ( direction.y < 0 )
 				angle = -angle;
 			catchEffectBody.transform.rotation = Quaternion.Euler( 0 , 0 , angle );

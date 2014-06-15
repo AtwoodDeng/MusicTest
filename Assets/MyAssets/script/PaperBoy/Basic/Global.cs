@@ -38,9 +38,9 @@ public static class Global {
 
 	public static Dictionary<string,string> HandCatchEffectDict
 		= new Dictionary<string, string> {
-		{"SpinCW" , "Effect/Hero/Dot"},
-		{"SpinAntiCW" , "Effect/Hero/Dot"},
-		{"Pull" , "Effect/Hero/F"}};
+		{"SpinCW" , "Effect/Hero/DotSmall"},
+		{"SpinAntiCW" , "Effect/Hero/DotSmall"},
+		{"Pull" , "Effect/Hero/DotSmall"}};
 	public static Dictionary<string,string> ArmCatchEffectDict
 	= new Dictionary<string, string> {
 		{"SpinCW" , "Effect/Hero/FeatherCW"},
@@ -48,4 +48,17 @@ public static class Global {
 		{"Pull" , "Effect/Hero/FeatherCW"}};
 
 	public static float EffectDestroyTime = 5f;
+
+	private static int _ID = 0 ;
+	public static int getID(){
+		Debug.Log("Global ID" + _ID.ToString());
+		return _ID++;
+	}
+
+	public static string EmptyPrefabPath = "Tool/Prefab/Empty";
+	public static string TextPrefabPath = "Tool/Prefab/Text";
+
+	public static Dictionary<string,string> LevelScriptDictionary
+	= new Dictionary<string, string> {
+		{"Level1" , "text/script/level1"}};
 }

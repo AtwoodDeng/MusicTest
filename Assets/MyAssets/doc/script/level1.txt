@@ -1,0 +1,55 @@
+level0:
+"One day, you will murder your father, sleep with your mother, and get into your sister's body."
+That's my father's word.
+
+"So, you have decided, right?" said the boy named Crow.
+
+"Yes, I'll leave the home as soon as I'm fifteen." I answered.
+
+"What about the money" doubted Crow
+"I'll get it from my father. And, of course, he won't know my plan." I told him.
+
+"That money is not enough. I mean, what about the future? You're just fifteen, no one will employ you, so you can not even support your self." Crow went on, "Besides, the world is totally unknown outside. There are things you never could imagine."
+"But I have to get out of here," I said to both him and myself. "No second path to go."
+
+"OK. When you decide to run, then run. But always remember, distance can not solve anything. You have to face what you must face."
+
+I didn't answer. And Crow went away.
+
+
+Level1
+Once again, I wake up from the nightmare. My father's word is repeating in my mind.
+get item:None(0/6)
+
+I have to get up. Today, I must get the money from my dad.
+get item: watch(1/6)
+
+I tell my father a lie, for the money.
+
+He stares at me and blows out a stream of smoke. 
+
+He says, "Get back and watch your damn TV, long nose."
+
+Finally, he stops looking at me and goes into his room.
+
+get item: money(2/6)
+
+My mother left me when I was four. And she brought my sister away. This is the only picture of my sister. We were playing happily on the seashore.
+
+I decided to bring this picture with me.
+
+get item: picture(3/6)
+
+The next thing is to wait for my fifteen's birthday. I decided to go at fifteen. It's too early before the fifteen and it's too late after the fifteen.
+
+At the time before I went, I think of a cat, and it soon occupy my brain. I don't know why, but now, I have to collect the rest things.
+
+item : 
+shirt, knife, cell phone
+
+coat, backpack
+
+
+
+
+

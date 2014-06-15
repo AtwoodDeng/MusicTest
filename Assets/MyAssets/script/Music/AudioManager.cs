@@ -179,7 +179,7 @@ public class AudioManager : MonoBehaviour
 				UpdateValue ();
 				checkAndPulse ();
 				checkLoop ();
-				GUIDebug.add (ShowType.label, "value = " + getValue ());
+//				GUIDebug.add (ShowType.label, "value = " + getValue ());
 		}
 
 		void UpdateValue ()

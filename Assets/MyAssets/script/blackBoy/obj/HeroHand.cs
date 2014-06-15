@@ -20,8 +20,27 @@ public class HeroHand : MonoBehaviour {
 	public HeroArm heroArm;
 	public float forceIntense = 0.025f;
 	public float toBodyForceRate = 0.33f;
-	public GameObject stayObj;
-	public Vector3 stayPos;
+	public GameObject stayObj
+	{
+		get {
+			return _stayObj;
+		}
+		set {
+			_stayObj = value;
+			stayObjCatchable = _stayObj.GetComponent<Catchable>();
+		}
+	}
+	private GameObject _stayObj;
+	public Catchable stayObjCatchable;
+	public Vector3 stayPos
+	{
+		get {
+			if ( stayAdhereObj != null )
+				return stayAdhereObj.transform.position;
+			return transform.position;
+		}
+	}
+	private GameObject stayAdhereObj;
 	public float MaxLength = 100f;
 
 	[HideInInspector]public GameObject catchEffectPrefab;
@@ -50,6 +69,10 @@ public class HeroHand : MonoBehaviour {
 	void Start () {
 		ID = getID();
 		collider.isTrigger = true;
+		GameObject emptyPrefab = Resources.Load(Global.EmptyPrefabPath) as GameObject;
+		stayAdhereObj = Instantiate( emptyPrefab ) as GameObject;
+		stayAdhereObj.transform.parent = this.transform;
+		stayAdhereObj.transform.localPosition = Vector3.zero;
 	}
 	
 	// Update is called once per frame
@@ -119,24 +142,25 @@ public class HeroHand : MonoBehaviour {
 	public void Shrink()
 	{
 		//Debug.Log("shrink " + state );
+		bool isShrink = false;
 		if ( state == HandState.Fly )
 		{
 			state = HandState.Shrink;
-
-			
-			MessageEventArgs msg = new MessageEventArgs();
-			msg.AddMessage( "HandID" , ID.ToString());
-			BEventManager.Instance.PostEvent( EventDefine.OnShrink , msg );
+			isShrink = true;
 
 		}else if ( state == HandState.Catch )
 		{
 			state = HandState.Shrink;
+			isShrink = true;
+		}
 
-			
+		if ( isShrink )
+		{
 			MessageEventArgs msg = new MessageEventArgs();
 			msg.AddMessage( "HandID" , ID.ToString());
 			BEventManager.Instance.PostEvent( EventDefine.OnShrink , msg );
-
+			stayAdhereObj.transform.parent = this.transform;
+			stayAdhereObj.transform.localPosition = Vector3.zero;
 		}
 	}
 
@@ -170,16 +194,28 @@ public class HeroHand : MonoBehaviour {
 		if ( state == HandState.Fly )
 		{
 			stayObj = _stayObj;
-			stayPos = transform.position;
+
+			if ( stayAdhereObj != null )
+			{
+				stayAdhereObj.transform.parent = _stayObj.transform;
+				stayAdhereObj.transform.position = transform.position;
+			}
 			rigidbody.velocity = Vector3.zero;
 			state = HandState.Catch;
 
 			CreateCatchEffect( stayPos );
 
-			
+
 			MessageEventArgs msg = new MessageEventArgs();
 			msg.AddMessage( "HandID" , ID.ToString());
 			msg.AddMessage( "ForceType", forceType.ToString());
+			if ( _stayObj.GetComponent<Catchable>() != null )
+			{
+				msg.AddMessage( "CatchableID" , _stayObj.GetComponent<Catchable>().getID ().ToString());
+				Debug.Log("HeroHand addID " + _stayObj.GetComponent<Catchable>().getID ().ToString() );
+				Vector3 pos = transform.position;
+				msg.AddMessage( "CatchPosition" , pos.x + " " + pos.y + " " + pos.z );
+			}
 			BEventManager.Instance.PostEvent( EventDefine.OnCatch , msg );
 		}
 	}
@@ -217,17 +253,47 @@ public class HeroHand : MonoBehaviour {
 			else if ( forceType == ForceType.SpinAntiCW )
 			{
 				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
-				force -= forceIntense * toBodyForceRate * toBody ;
+//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude);
+//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude);
+				force += getForceN();
 				return force;
 			}else if ( forceType == ForceType.SpinCW )
 			{
 				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
-				force -= forceIntense * toBodyForceRate * toBody ;
+//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude );
+//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude );
+				force += getForceN();
 				return force;
 			}
 		}
 		return Vector3.zero;
 	}
+
+	public Vector3 getForceN()
+	{
+		
+		if ( state == HandState.Catch )
+		{
+			float direct = -1f;
+			if ( stayObjCatchable != null )
+			{
+				switch( stayObjCatchable.forceType)
+				{
+				case Catchable.ForceType.In :
+					direct = -1f;
+					break;
+				case Catchable.ForceType.Out:
+					direct = 1f;
+					break;
+				}
+			}
+			Vector3 toBody = heroBody.transform.position - transform.position;
+			return direct * forceIntense * toBodyForceRate * toBody ;
+
+		}
+		return Vector3.zero;
+	}
+
 	void OnTriggerEnter( Collider collider )
 	{
 //		Debug.Log("trigger enter " + collider.gameObject.name + " " + collider.gameObject.tag );
