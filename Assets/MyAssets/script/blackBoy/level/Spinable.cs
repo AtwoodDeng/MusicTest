@@ -186,10 +186,13 @@ public class Spinable : Catchable {
 	{
 		//set the spin animation
 		Debug.Log("Spin" );
+		EndSpin();
 		Quaternion from = transform.rotation;
 		Quaternion to = Quaternion.Euler( ( from.eulerAngles + new Vector3( 0 , 0 , spinAngle ) ) );
-		HOTween.To( transform , spinTime , new TweenParms().Prop("rotation" , to ).Ease(EaseType.EaseInOutBack));
+		HOTween.To( transform , spinTime , new TweenParms().Prop("rotation" , to ).Ease(EaseType.EaseInOutBack)
+		           .OnComplete(this.gameObject,"ReadySpin"));
 
+		Debug.Log("After hotween");
 		//send the message to shrink the hands
 		if ( isShrink )
 		{

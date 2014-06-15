@@ -10,7 +10,13 @@ public class BInputManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		Screen.showCursor = false;
 		DealMouse();
+
+		if ( Input.GetKeyDown( KeyCode.Escape ))
+		{
+			Application.Quit();
+		}
 	}
 
 	public enum MouseState

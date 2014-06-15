@@ -8,6 +8,7 @@ public static class Global {
 
 	public static float SwitchTime = 1f ;
 	public static float MouseDestroyTime = 1f; 
+	public static float ObjDestroyTime = 5f;
 
 	public static Vector3 LevelStartPosition = new Vector3( 0 , 0 , 200f );
 
@@ -18,6 +19,7 @@ public static class Global {
 	public static Vector3 BCursorPosition = new Vector3( 0 , 0 , -0.75f );
 	public static Vector3 BHeroArmOff = new Vector3( 0 , 0 , 0.5f );
 	public static Vector3 BEffecPosition = new Vector3( 0 , 0 , -0.5f );
+	public static Vector3 BTipsPosition = new Vector3( 0 , 1f , 0f );
 
 
 
@@ -57,8 +59,17 @@ public static class Global {
 
 	public static string EmptyPrefabPath = "Tool/Prefab/Empty";
 	public static string TextPrefabPath = "Tool/Prefab/Text";
+	public static string TipsPrefabPath = "Tool/Prefab/Tips";
+	public static float TextRelativelyRate = 0.7f;
 
 	public static Dictionary<string,string> LevelScriptDictionary
 	= new Dictionary<string, string> {
 		{"Level1" , "text/script/level1"}};
+
+	public static int LevelScriptKeyIndex = 0;
+
+	public static float ShowDialogTimeBlock = 3f;
+
+	public static float TextShowYRan = 1f;
+
 }

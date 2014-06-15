@@ -76,6 +76,7 @@ public class BFollowWith : MonoBehaviour {
 		relativePos = transform.position -  target.transform.position ;
 		targetOriginalPos = target.transform.position;
 		thisOriginalPos = transform.position;
+		Update();
 
 //		if ( followState == FollowState.Relatively )
 //			relativePos = transform.position -  target.transform.position ;
