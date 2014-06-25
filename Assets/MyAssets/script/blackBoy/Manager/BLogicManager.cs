@@ -99,11 +99,11 @@ public class BLogicManager : MonoBehaviour {
 			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
 		}
 		
-		if ( Global.MouseRight.Equals( msg.GetMessage("type")))
-		{
-			msg.AddMessage("isLeft", Boolean.FalseString );
-			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
-		}
+//		if ( Global.MouseRight.Equals( msg.GetMessage("type")))
+//		{
+//			msg.AddMessage("isLeft", Boolean.FalseString );
+//			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
+//		}
 		
 	}
 

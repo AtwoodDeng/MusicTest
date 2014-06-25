@@ -285,6 +285,13 @@ public class HeroBody : MonoBehaviour {
 		HeroArm arm = ((GameObject)Instantiate(HeroArmPrefab)).GetComponent<HeroArm>();
 		hand.Init( this , arm );
 		arm.Init( this , hand );
+		if ( arm.renderer != null )
+		{
+			if ( isLeft )
+				arm.renderer.material.color = Global.ArmLeftColor;
+			else
+				arm.renderer.material.color = Global.ArmRightColor;
+		}
 		if ( isLeft ) 
 		{
 			hand.SetForceType( HeroHand.ForceType.SpinAntiCW );

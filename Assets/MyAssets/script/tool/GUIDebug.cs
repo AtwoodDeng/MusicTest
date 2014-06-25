@@ -31,13 +31,13 @@ public class GUIDebug : MonoBehaviour {
 
 	void OnGUI()
 	{
-//		hasNew = false;
-//		for( int i = 0 ; i < types.Count ; ++i )
-//		{
-//			//if ( ShowType.label == types[i] )
-//				GUILayout.Label( contents[i] );
-//
-//		}
+		hasNew = false;
+		for( int i = 0 ; i < types.Count ; ++i )
+		{
+			//if ( ShowType.label == types[i] )
+				GUILayout.Label( contents[i] );
+
+		}
 
 //		GUILayout.Label (AudioManager.instance.getValue ().ToString());
 //		GUI.HorizontalSlider (new Rect (100, 20, 300, 50), 0.05f

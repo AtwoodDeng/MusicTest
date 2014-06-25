@@ -21,7 +21,8 @@ public static class Global {
 	public static Vector3 BEffecPosition = new Vector3( 0 , 0 , -0.5f );
 	public static Vector3 BTipsPosition = new Vector3( 0 , 1f , 0f );
 
-
+	public static Color ArmLeftColor = new Color( 0.1f , 0.1f , 0.1f );
+	public static Color ArmRightColor = new Color( 0.6f , 0.6f , 0.6f );
 
 	public static string HandStayTag = "ROCK" ;
 
@@ -71,5 +72,7 @@ public static class Global {
 	public static float ShowDialogTimeBlock = 3f;
 
 	public static float TextShowYRan = 1f;
+
+	public static float MAX_FLOAT15 = Mathf.Pow( 2f , 15f );
 
 }

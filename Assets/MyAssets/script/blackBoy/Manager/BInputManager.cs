@@ -10,8 +10,10 @@ public class BInputManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		Screen.showCursor = false;
+
 		DealMouse();
+
+		DealCursor();
 
 		if ( Input.GetKeyDown( KeyCode.Escape ))
 		{
@@ -36,6 +38,15 @@ public class BInputManager : MonoBehaviour {
 	DateTime mouseStartTime;
 	public float pointSenseTime = 0.2f;
 
+	void DealCursor()
+	{
+		
+		Screen.showCursor = false;
+
+		if (cursor != null )
+			cursor.transform.localPosition = new Vector3( mousePos.x ,mousePos.y, Global.BCursorPosition.z);
+	}
+
 	void DealMouse()
 	{
 		//get the position of mouse, represent by (x,y)
@@ -55,8 +66,7 @@ public class BInputManager : MonoBehaviour {
 		mousePos.z = Global.BstaticPosition.z;
 		GUIDebug.add(ShowType.label , mousePos.ToString());
 
-		if (cursor != null )
-			cursor.transform.localPosition = new Vector3( mousePos.x ,mousePos.y, Global.BCursorPosition.z);
+
 //		pos = Input.mousePosition;
 		GUIDebug.add( ShowType.label , Input.mousePosition.ToString() );
 		GUIDebug.add( ShowType.label , mousePos.ToString());
