@@ -14,6 +14,7 @@ public enum EventDefine{
 	OnStrenchHand ,
 	OnShrinkHand ,
 	OnMoveHand ,
+	OnChangeForce,
 	OnCatch ,
 	OnShrink ,
 	OnSpinFinish ,

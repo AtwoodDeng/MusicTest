@@ -8,7 +8,7 @@ public static class Global {
 
 	public static float SwitchTime = 1f ;
 	public static float MouseDestroyTime = 1f; 
-	public static float ObjDestroyTime = 5f;
+	public static float ObjDestroyTime = 2f;
 
 	public static Vector3 LevelStartPosition = new Vector3( 0 , 0 , 200f );
 
@@ -43,12 +43,20 @@ public static class Global {
 		= new Dictionary<string, string> {
 		{"SpinCW" , "Effect/Hero/DotSmall"},
 		{"SpinAntiCW" , "Effect/Hero/DotSmall"},
-		{"Pull" , "Effect/Hero/DotSmall"}};
+		{"Pull" , "Effect/Hero/DotSmall"},
+		{"None", ""}};
+	public static Dictionary<string,string> HandStayObjCatchEffect
+	= new Dictionary<string, string> {
+		{"SpinCW" , "Effect/Hero/FeatherSpinCW"},
+		{"SpinAntiCW" , "Effect/Hero/FeatherSpinAntiCW"},
+		{"Pull" , "Effect/Hero/DotSmall"},
+		{"None", "Effect/Hero/DotSmall"}};
 	public static Dictionary<string,string> ArmCatchEffectDict
 	= new Dictionary<string, string> {
 		{"SpinCW" , "Effect/Hero/FeatherCW"},
 		{"SpinAntiCW" , "Effect/Hero/FeatherAntiCW"},
-		{"Pull" , "Effect/Hero/FeatherCW"}};
+		{"Pull" , "Effect/Hero/FeatherCW"},
+		{"None", ""}};
 
 	public static float EffectDestroyTime = 5f;
 
@@ -74,5 +82,6 @@ public static class Global {
 	public static float TextShowYRan = 1f;
 
 	public static float MAX_FLOAT15 = Mathf.Pow( 2f , 15f );
+
 
 }

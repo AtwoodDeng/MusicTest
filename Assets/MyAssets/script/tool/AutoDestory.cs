@@ -8,6 +8,7 @@ public class AutoDestory : MonoBehaviour {
 
 	public bool isDestroyOnAwake = true;
 	public bool isFadeOut = false;
+	public bool isStopParticle = false;
 
 	// Use this for initialization
 	void Awake () {
@@ -20,7 +21,8 @@ public class AutoDestory : MonoBehaviour {
 		if ( destroyTime > 0 )
 		{
 			Invoke("DestroyMySelf" , destroyTime );
-			if ( isFadeOut ){
+			if ( isFadeOut )
+			{
 				if ( GetComponent<tk2dSprite>() != null){
 					tk2dSprite spirte =  GetComponent<tk2dSprite>();
 
@@ -32,6 +34,21 @@ public class AutoDestory : MonoBehaviour {
 					           toColor);
 				}
 			}
+			if ( isStopParticle )
+			{
+				if ( GetComponent<ParticleSystem>() != null ){
+					GetComponent<ParticleSystem>().enableEmission = false;
+				}
+				ParticleSystem[] particles = GetComponentsInChildren<ParticleSystem>();
+				if ( particles != null )
+				{
+					foreach( ParticleSystem ps in particles )
+					{
+						ps.enableEmission = false;
+					}
+				}
+			}
+
 		}
 	}
 

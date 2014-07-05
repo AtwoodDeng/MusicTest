@@ -20,6 +20,8 @@ public class HeroBody : MonoBehaviour {
 	public float advoidIntense = 1.0f;
 	public float MAXAdvoidForce = 5.0f;
 
+	public HeroHand.ForceType tempForceType = HeroHand.ForceType.SpinCW;
+
 	public class HandGroup{
 		int num;
 		List<HeroHand> hands = new List<HeroHand>();
@@ -57,12 +59,22 @@ public class HeroBody : MonoBehaviour {
 					return false;
 			return true;
 		}
+
+	
 		
 		public HandGroup( HeroBody _body )
 		{
 			body = _body;
 			state = HandGroupState.Free;
 		}
+
+		public void setForceType( HeroHand.ForceType type )
+		{
+			
+			for ( int i = 0 ; i < hands.Count ; ++i )
+				hands[i].SetForceType( type );
+		}
+
 		
 		public void AddHand( HeroHand hand )
 		{
@@ -71,13 +83,10 @@ public class HeroBody : MonoBehaviour {
 		
 		public void Throw( Vector3 from , Vector3 to , float intense )
 		{
-			
 			for( int i = 0 ; i < hands.Count ; ++i )
 			{
-				
 				hands[i].Throw( to.normalized  * intense );
 			}
-			
 		}
 		
 		public void Shrink()
@@ -122,6 +131,7 @@ public class HeroBody : MonoBehaviour {
 //		BEventManager.Instance.RegisterEvent (EventDefine.OnStrenchHand ,OnStrenchHand );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMoveHand, OnMoveHand);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnChangeForce, OnChangeForce);
 //		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
 
 	}
@@ -130,6 +140,7 @@ public class HeroBody : MonoBehaviour {
 //		BEventManager.Instance.UnregisterEvent (EventDefine.OnStrenchHand, OnStrenchHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMoveHand, OnMoveHand);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnChangeForce, OnChangeForce);
 //		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
 	}
 //
@@ -176,7 +187,16 @@ public class HeroBody : MonoBehaviour {
 //
 //
 //	}
+	public void OnChangeForce(EventDefine eventName, object sender, EventArgs args)
+	{
+		if ( tempForceType == HeroHand.ForceType.SpinAntiCW )
+			tempForceType = HeroHand.ForceType.SpinCW;
+		else if ( tempForceType == HeroHand.ForceType.SpinCW )
+			tempForceType = HeroHand.ForceType.SpinAntiCW;
 
+		leftHandGroup.setForceType( tempForceType );
+		rightHandGroup.setForceType( tempForceType );
+	}
 		
 	public void OnMoveHand(EventDefine eventName, object sender, EventArgs args)
 	{
@@ -194,31 +214,43 @@ public class HeroBody : MonoBehaviour {
 			posX = float.Parse( msg.GetMessage("posX"));
 			posY = float.Parse( msg.GetMessage("posY"));
 		}
-		bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
-		if ( isLeft )
-		{
-			if ( leftHandGroup.state == HandGroup.HandGroupState.Free )
-			{
-				StrenchHandToward(posX , posY , isLeft );
-				ShrinkHand( !isLeft );
-			}
-			else if ( leftHandGroup.state == HandGroup.HandGroupState.Catch )
-			{
-				ShrinkHand(isLeft);
-			}
-		}else 
-		{
+		//strench left and shrink right if left is free
+		//else strench right and shrink left
+
+		bool isLeft =  (leftHandGroup.state == HandGroup.HandGroupState.Free);
 			
-			if ( rightHandGroup.state == HandGroup.HandGroupState.Free )
-			{
-				StrenchHandToward(posX , posY , isLeft );
-				ShrinkHand( !isLeft );
-			}
-			else if ( rightHandGroup.state == HandGroup.HandGroupState.Catch )
-			{
-				ShrinkHand(isLeft);
-			}
-		}
+		leftHandGroup.setForceType( tempForceType );
+		rightHandGroup.setForceType( tempForceType );
+
+		StrenchHandToward( posX , posY , isLeft );
+		ShrinkHand( !isLeft );
+
+
+//		bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
+//		if ( isLeft )
+//		{
+//			if ( leftHandGroup.state == HandGroup.HandGroupState.Free )
+//			{
+//				StrenchHandToward(posX , posY , isLeft );
+//				ShrinkHand( !isLeft );
+//			}
+//			else if ( leftHandGroup.state == HandGroup.HandGroupState.Catch )
+//			{
+//				ShrinkHand(isLeft);
+//			}
+//		}else 
+//		{
+//			
+//			if ( rightHandGroup.state == HandGroup.HandGroupState.Free )
+//			{
+//				StrenchHandToward(posX , posY , isLeft );
+//				ShrinkHand( !isLeft );
+//			}
+//			else if ( rightHandGroup.state == HandGroup.HandGroupState.Catch )
+//			{
+//				ShrinkHand(isLeft);
+//			}
+//		}
 	}
 		
 //	public void OnStrenchHand(EventDefine eventName, object sender, EventArgs args)
@@ -294,12 +326,14 @@ public class HeroBody : MonoBehaviour {
 		}
 		if ( isLeft ) 
 		{
-			hand.SetForceType( HeroHand.ForceType.SpinAntiCW );
+//			hand.SetForceType( HeroHand.ForceType.SpinAntiCW );
+			hand.SetForceType( tempForceType );
 			leftHandGroup.AddHand( hand );
 		}
 		else
 		{
-			hand.SetForceType( HeroHand.ForceType.SpinCW );
+//			hand.SetForceType( HeroHand.ForceType.SpinCW );
+			hand.SetForceType( tempForceType );
 			rightHandGroup.AddHand( hand );
 		}
 	}

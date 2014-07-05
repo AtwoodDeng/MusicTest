@@ -45,6 +45,7 @@ public class HeroHand : MonoBehaviour {
 		}
 	}
 	private GameObject stayAdhereObj;
+	public GameObject stayAdhereEffect;
 	public float MaxLength = 100f;
 
 	[HideInInspector]public GameObject catchEffectPrefab;
@@ -62,6 +63,7 @@ public class HeroHand : MonoBehaviour {
 		SpinCW,
 		SpinAntiCW,
 		Pull,
+		None,
 	}
 	public ForceType forceType;
 
@@ -77,6 +79,13 @@ public class HeroHand : MonoBehaviour {
 		stayAdhereObj = Instantiate( emptyPrefab ) as GameObject;
 		stayAdhereObj.transform.parent = this.transform;
 		stayAdhereObj.transform.localPosition = Vector3.zero;
+//		stayAdhereEffectPrefabs = new GameObject[Global.HandStayObjCatchEffect.Count];
+//		foreach( string key in Global.HandStayObjCatchEffect.Keys )
+//		{
+//			int index = (int)Enum.Parse( typeof(ForceType) , key );
+//			stayAdhereEffectPrefabs[index] = 
+//				Resources.Load(Global.HandStayObjCatchEffect[key]) as GameObject;
+//		}
 	}
 	
 	// Update is called once per frame
@@ -160,6 +169,7 @@ public class HeroHand : MonoBehaviour {
 
 		if ( isShrink )
 		{
+			SetForceType( ForceType.None );
 			MessageEventArgs msg = new MessageEventArgs();
 			msg.AddMessage( "HandID" , ID.ToString());
 			BEventManager.Instance.PostEvent( EventDefine.OnShrink , msg );
@@ -206,7 +216,8 @@ public class HeroHand : MonoBehaviour {
 			}
 			rigidbody.velocity = Vector3.zero;
 			state = HandState.Catch;
-
+			
+			SetForceType( forceType );
 			CreateCatchEffect( stayPos );
 
 
@@ -244,12 +255,15 @@ public class HeroHand : MonoBehaviour {
 	public void DoCatch()
 	{
 		if ( state == HandState.Catch )
+		{
 			transform.position = stayPos;
+			UpdateForceType(true,false);
+		}
 	}
 
 	public Vector3 getForce()
 	{
-		UpdateForceType();
+		UpdateForceType(false,false);
 
 		if ( state == HandState.Catch )
 		{
@@ -305,68 +319,161 @@ public class HeroHand : MonoBehaviour {
 		return Vector3.zero;
 	}
 
-	public void UpdateForceType()
+	public void UpdateForceType( bool ifUpdate = true , bool ifForceChange = false)
 	{
 		GUIDebug.add( ShowType.label , "forceType " + forceType.ToString() );
-		ForceTypeTime += Time.deltaTime;
 
-		if ( state == HandState.Catch )
-		{
-			if ( stayObj != null )
-			{
-		
-				Vector3 mousePos = BInputManager.Instance.MousePosition;
-				Vector3 bodyPos = heroBody.transform.position;
-				Vector3 handPos = stayObj.transform.position;
-
-				if ( Mathf.Abs( handPos.y - bodyPos.y ) < MinChangeDistance )
-				{
-					ForceTypeTime = 0f;
-				}
-				if ( ForceTypeTime > MinChangeForceTypeTime )
-				{
-					ChangeForceType();
-				}
-			}
-		}
+//		if ( state == HandState.Catch )
+//		{
+//			
+//			if ( ifUpdate )
+//				ForceTypeTime += Time.deltaTime;
+//
+//			if ( stayObj != null )
+//			{
+//				Vector3 mousePos = BInputManager.Instance.MousePosition;
+//				Vector3 bodyPos = heroBody.transform.position;
+//				Vector3 handPos = stayObj.transform.position;
+//
+//				if ( Mathf.Abs( handPos.y - bodyPos.y ) < MinChangeDistance )
+//				{
+//					ForceTypeTime = 0f;
+//				}
+//				if ( ForceTypeTime > MinChangeForceTypeTime )
+//				{
+//					ChangeForceType();
+//				}
+//				if ( ifForceChange )
+//				{
+//					SetForceType( ForceType.None );
+//					ChangeForceType();
+//				}
+//			}
+//		}
 	}
 
 	public void ChangeForceType()
 	{
-		if ( state == HandState.Catch )
+//		if ( state == HandState.Catch )
+//		{
+//			if ( stayObj != null )
+//			{
+//				
+//				Vector3 mousePos = BInputManager.Instance.MousePosition;
+//				Vector3 bodyPos = heroBody.transform.position;
+//				Vector3 handPos = stayObj.transform.position;
+//
+//				ForceType toForceType = ForceType.Pull;
+//				//hand over body
+//				if ( handPos.y > bodyPos.y )
+//				{
+//					if ( mousePos.x > bodyPos.x )
+//					{
+//						toForceType = ForceType.SpinAntiCW;
+//					}else
+//					{
+//						toForceType = ForceType.SpinCW;
+//					}
+//				}
+//				else
+//					//body over hand 
+//				{
+//					if ( mousePos.x  > bodyPos.x )
+//					{
+//						toForceType = ForceType.SpinCW;
+//					}else
+//					{
+//						toForceType = ForceType.SpinAntiCW;
+//					}
+//					
+//				}
+//
+//				if ( toForceType != forceType )
+//				{
+//					SetForceType( toForceType );
+//				}
+//
+//			}
+//		}
+	}
+
+	public void SetForceType( ForceType toForceType )
+	{
+//		if ( forceType == toForceType )
+//			return ;
+		Debug.Log("SetForceType" + " from " + forceType + " to " + toForceType );
+
+		catchEffectPrefab =  Resources.Load( Global.HandCatchEffectDict [ toForceType.ToString() ] ) as GameObject;
+
+		if ( stayAdhereEffect != null )
 		{
-			if ( stayObj != null )
-			{
-				
-				Vector3 mousePos = BInputManager.Instance.MousePosition;
-				Vector3 bodyPos = heroBody.transform.position;
-				Vector3 handPos = stayObj.transform.position;
-				
-				//hand over body
-				if ( handPos.y > bodyPos.y )
-				{
-					if ( mousePos.x > bodyPos.x )
-					{
-						forceType = ForceType.SpinAntiCW;
-					}else
-					{
-						forceType = ForceType.SpinCW;
-					}
-				}
-				else
-					//body over hand 
-				{
-					if ( mousePos.x  > bodyPos.x )
-					{
-						forceType = ForceType.SpinCW;
-					}else
-					{
-						forceType = ForceType.SpinAntiCW;
-					}
-					
-				}
-			}
+			AutoDestory destory = stayAdhereEffect.AddComponent<AutoDestory>();
+			destory.isStopParticle = true;
+			destory.destroyTime = 3f;
+			destory.StartAutoDestory();
 		}
+		Debug.Log( "stayAdhereObj" + stayAdhereObj + "stat " + state );
+		if ( stayAdhereObj != null && state == HandState.Catch )
+		{
+
+			switch( toForceType )
+			{
+				case ForceType.SpinAntiCW:
+				{
+					GameObject prefab = Resources.Load( Global.HandStayObjCatchEffect[ toForceType.ToString()] ) as GameObject;
+					if ( prefab == null )
+						break;
+					stayAdhereEffect = Instantiate( prefab ) as GameObject;
+					if ( stayAdhereEffect == null )
+						break;
+					stayAdhereEffect.transform.parent = stayAdhereObj.transform.parent;
+					stayAdhereEffect.transform.localPosition = stayAdhereObj.transform.localPosition;
+					stayAdhereEffect.transform.localScale = Vector3.one;
+				}
+					break;
+				case ForceType.SpinCW:
+				{
+					GameObject prefab = Resources.Load( Global.HandStayObjCatchEffect[ toForceType.ToString()] ) as GameObject;
+					if ( prefab == null )
+						break;
+					stayAdhereEffect = Instantiate( prefab ) as GameObject;
+					if ( stayAdhereEffect == null )
+						break;
+					stayAdhereEffect.transform.parent = stayAdhereObj.transform.parent;
+					stayAdhereEffect.transform.localPosition = stayAdhereObj.transform.localPosition;
+					stayAdhereEffect.transform.localScale = Vector3.one;
+				}
+					break;
+				default:
+					break;
+				}
+		}
+
+//		if (!( stayAdhereEffectPrefabs == null || stayAdhereEffectPrefabs.Length < Global.HandStayObjCatchEffect.Count ) )
+//		{
+//
+//			if ( toForceType == ForceType.SpinCW )
+//			{
+//				
+//				Debug.Log("CW Index is " + ((int)ForceType.SpinCW).ToString());
+//				stayAdhereEffect = Instantiate( stayAdhereEffectPrefabs[(int)ForceType.SpinCW]) as GameObject;
+//				stayAdhereEffect.transform.parent = stayAdhereObj.transform;
+//				stayAdhereEffect.transform.localPosition = Vector3.zero;
+//				stayAdhereEffect.transform.localScale = Vector3.one;
+//
+//			}else if ( toForceType == ForceType.SpinAntiCW )
+//			{
+//				Debug.Log("AntiCW Index is " + ((int)ForceType.SpinAntiCW).ToString());
+//				Debug.Log("prefabs size is " + stayAdhereEffectPrefabs.Length );
+//
+//				stayAdhereEffect = Instantiate( stayAdhereEffectPrefabs[(int)ForceType.SpinAntiCW]) as GameObject;
+//				stayAdhereEffect.transform.parent = stayAdhereObj.transform;
+//				stayAdhereEffect.transform.localPosition = Vector3.zero;
+//				stayAdhereEffect.transform.localScale = Vector3.one;
+//			}
+//		}
+
+		forceType = toForceType;
 	}
 
 	public Vector3 getForceSecond()
@@ -389,6 +496,7 @@ public class HeroHand : MonoBehaviour {
 			}
 			Vector3 toBody = heroBody.transform.position - transform.position;
 			return direct * forceIntense * toBodyForceRate * toBody ;
+
 		}
 		return Vector3.zero;
 	}
@@ -427,21 +535,21 @@ public class HeroHand : MonoBehaviour {
 		}
 	}
 
-	public void SetForceType( ForceType type )
-	{
-		if ( true )
-		{
-			forceType = type;
-			catchEffectPrefab =  Resources.Load( Global.HandCatchEffectDict [ type.ToString() ] ) as GameObject;
-			Debug.Log( "[SetForceType] " + Global.HandCatchEffectDict[ type.ToString() ] );
-			if ( catchEffectPrefab == null )
-			{
-				Debug.Log("Cannot find prefab for " + type.ToString());
-			}
-
-		}
-
-	}
+//	public void SetForceType( ForceType type )
+//	{
+//		if ( true )
+//		{
+//			forceType = type;
+//			catchEffectPrefab =  Resources.Load( Global.HandCatchEffectDict [ type.ToString() ] ) as GameObject;
+//			Debug.Log( "[SetForceType] " + Global.HandCatchEffectDict[ type.ToString() ] );
+//			if ( catchEffectPrefab == null )
+//			{
+//				Debug.Log("Cannot find prefab for " + type.ToString());
+//			}
+//
+//		}
+//
+//	}
 
 	public Vector3 getArmPos()
 	{

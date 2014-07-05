@@ -35,7 +35,6 @@ public class UIButton : UIButtonColor
 	{
 		//Collider col = collider;
 		//if (col != null) col.enabled = true;
-
 		if (isEnabled)
 		{
 			if (mStarted)

@@ -99,11 +99,13 @@ public class BLogicManager : MonoBehaviour {
 			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
 		}
 		
-//		if ( Global.MouseRight.Equals( msg.GetMessage("type")))
-//		{
+		if ( Global.MouseRight.Equals( msg.GetMessage("type")))
+		{
 //			msg.AddMessage("isLeft", Boolean.FalseString );
 //			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
-//		}
+			msg.AddMessage("isLeft" , Boolean.FalseString );
+			BEventManager.Instance.PostEvent( EventDefine.OnChangeForce , args );
+		}
 		
 	}
 
@@ -128,9 +130,9 @@ public class BLogicManager : MonoBehaviour {
 
 		//set the follow 
 		Vector3 initpos = BObjManager.Instance.Hero.transform.position;
-		Debug.Log( "NumDrawnChara" + textMesh.NumDrawnCharacters() );
-		Debug.Log( "invOrthoSize" + textMesh.font.largestWidth );
-		Debug.Log( "textMesh" + textMesh.scale.x );
+//		Debug.Log( "NumDrawnChara" + textMesh.NumDrawnCharacters() );
+//		Debug.Log( "invOrthoSize" + textMesh.font.largestWidth );
+//		Debug.Log( "textMesh" + textMesh.scale.x );
 		initpos.x -= ( textMesh.NumDrawnCharacters() / 2 * textMesh.font.largestWidth * textMesh.scale.x) / ( 1 -  Global.TextRelativelyRate) / 2f;
 		initpos.y += UnityEngine.Random.Range( - Global.TextShowYRan , + Global.TextShowYRan );
 		textObj.transform.position = initpos;
