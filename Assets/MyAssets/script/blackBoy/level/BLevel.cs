@@ -74,4 +74,13 @@ public class BLevel : MonoBehaviour {
 	virtual public void DealTrigger( string msg )
 	{
 	}
+
+	virtual public void DealWith( float deltaTime )
+	{
+	}
+
+	void Update()
+	{
+		DealWith( Time.deltaTime );
+	}
 }

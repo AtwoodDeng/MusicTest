@@ -109,7 +109,7 @@ public class BLevel1 : BLevel {
 		GUIDebug.add( ShowType.label , state.ToString());
 	}
 
-	void DealWith(float deltaTime)
+	public override void DealWith(float deltaTime)
 	{
 		switch( state )
 		{

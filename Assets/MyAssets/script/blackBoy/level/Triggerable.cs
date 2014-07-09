@@ -13,7 +13,7 @@ public class Triggerable : MonoBehaviour {
 	public bool isBarrier = false;
 
 	public Vector3 barrierDirection ;
-	public float barrierVelocityLimit = 2f;
+	//public float barrierVelocityLimit = 2f;
 	public float barrierIntense = 0.05f;
 
 	public bool isUpdateWhenExit = false;
