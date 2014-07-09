@@ -121,13 +121,15 @@ public class BLevel1 : BLevel {
 			showTips( text );
 			break;
 		case State.Begin:
-			showNextDialog(4);
+			showNextDialogGroup();
+//			showNextDialog(4);
 			state = State.WakeUp;
 			break;
 		case State.WakeUp:
 			if ( msgs.Contains("wakeup"))
 			{
-				showNextDialog(3);
+				showNextDialogGroup();
+//				showNextDialog(3);
 				state = State.GetWatch;
 			}
 			break;
@@ -142,7 +144,9 @@ public class BLevel1 : BLevel {
 			if ( msgs.Contains("get_ear"))
 			{
 				state = State.FatherNose;
-				showNextDialog();
+				
+				showNextDialogGroup();
+//				showNextDialog();
 			}
 			break;
 			
@@ -150,7 +154,9 @@ public class BLevel1 : BLevel {
 			if ( msgs.Contains("get_nose"))
 			{
 				state = State.FatherMouth;
-				showNextDialog();
+				
+				showNextDialogGroup();
+//				showNextDialog();
 			}
 			break;
 			
@@ -159,7 +165,9 @@ public class BLevel1 : BLevel {
 			{
 				eye.enabled = true;
 				state = State.FatherEye;
-				showNextDialog();
+				
+				showNextDialogGroup();
+//				showNextDialog();
 			}
 			break;
 			
@@ -181,7 +189,10 @@ public class BLevel1 : BLevel {
 				           , EaseType.EaseOutQuart
 				           , 0 );
 				state = State.FatherMoney;
-				showNextDialog(3);
+				
+				showNextDialogGroup();
+
+//				showNextDialog(3);
 			}
 			break;
 			
@@ -195,14 +206,18 @@ public class BLevel1 : BLevel {
 		case State.PhotoIn:
 			if ( msgs.Contains("enter_photo"))
 			{
-				showNextDialog(5);
+				
+				showNextDialogGroup();
+//				showNextDialog(5);
 				state = State.PhotoGet;
 			}
 			break;
 		case State.PhotoGet:
 			if ( msgs.Contains("get_photo"))
 			{
-				showNextDialog();
+				
+				showNextDialogGroup();
+//				showNextDialog();
 				state = State.TagIn;
 				p_t.isBarrier = false;
 			}
@@ -210,7 +225,9 @@ public class BLevel1 : BLevel {
 		case State.TagIn:
 			if ( msgs.Contains("enter_tag"))
 			{
-				showNextDialog( 4 );
+				
+				showNextDialogGroup();
+//				showNextDialog( 4 );
 				state = State.CatIn;
 				t_c.isBarrier = false;
 			}
@@ -218,7 +235,9 @@ public class BLevel1 : BLevel {
 		case State.CatIn:
 			if ( msgs.Contains("enter_cat"))
 			{
-				showNextDialog( 5 );
+				
+				showNextDialogGroup();
+//				showNextDialog( 5 );
 				
 				HOTween.To( catBody.transform
 				           , 40f
@@ -235,7 +254,9 @@ public class BLevel1 : BLevel {
 		case State.Final:
 			if ( itemCount >= 6 )
 			{
-				showNextDialog( 4 );
+				
+				showNextDialogGroup();
+//				showNextDialog( 4 );
 				state = State.FadeOut;
 				fadeOutTempTime = 0;
 			}

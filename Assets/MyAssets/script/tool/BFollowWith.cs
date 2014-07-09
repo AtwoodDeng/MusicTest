@@ -8,6 +8,7 @@ public class BFollowWith : MonoBehaviour {
 	public enum FollowState{
 		Relatively,   // put at the target's 
 		HalfRelatively,  
+		HalfRelativelyModefied,
 		HalfAt,   //put between the target's ori position and temp position 
 		At,   //put at the target's position
 
@@ -94,6 +95,9 @@ public class BFollowWith : MonoBehaviour {
 		case FollowState.HalfRelatively:
 			Vector3 thisOriToTarTemp = target.transform.position - thisOriginalPos;
 			return thisOriginalPos + thisOriToTarTemp * RelativelyRate;
+		case FollowState.HalfRelativelyModefied:
+			Vector3 targetDiff = target.transform.position - targetOriginalPos;
+			return thisOriginalPos + targetDiff * RelativelyRate;
 		case FollowState.HalfAt:
 			Vector3 targetOriToTemp = target.transform.position - targetOriginalPos;
 			return targetOriginalPos + targetOriToTemp * RelativelyRate;

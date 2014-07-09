@@ -19,6 +19,7 @@ public static class Global {
 	public static Vector3 BCursorPosition = new Vector3( 0 , 0 , -0.75f );
 	public static Vector3 BHeroArmOff = new Vector3( 0 , 0 , 0.5f );
 	public static Vector3 BEffecPosition = new Vector3( 0 , 0 , -0.5f );
+	public static Vector3 BTextPosition = new Vector3( 0 , -2.35f , 0f );
 	public static Vector3 BTipsPosition = new Vector3( 0 , 1f , 0f );
 
 	public static Color ArmLeftColor = new Color( 0.1f , 0.1f , 0.1f );
@@ -57,6 +58,14 @@ public static class Global {
 		{"SpinAntiCW" , "Effect/Hero/FeatherAntiCW"},
 		{"Pull" , "Effect/Hero/FeatherCW"},
 		{"None", ""}};
+	public static Dictionary<string,string> CursorDict
+	= new Dictionary<string, string> {
+		{"Free" , "Tool/Prefab/CursorFree"},
+		{"PointCW" , "Tool/Prefab/CursorCW"},
+		{"PointACW" , "Tool/Prefab/CursorACW"},
+		{"PointCatch" , "Tool/Prefab/CursorCatch"},
+		{"None", ""}};
+
 
 	public static float EffectDestroyTime = 5f;
 
@@ -69,7 +78,10 @@ public static class Global {
 	public static string EmptyPrefabPath = "Tool/Prefab/Empty";
 	public static string TextPrefabPath = "Tool/Prefab/Text";
 	public static string TipsPrefabPath = "Tool/Prefab/Tips";
-	public static float TextRelativelyRate = 0.7f;
+	public static float TextFontRate = 0.5f;
+	public static float TextRelativelyRate = 0.12f;
+	public static float TextShowTime = 2f;
+	public static float TextDisappearTime = 1f;
 
 	public static Dictionary<string,string> LevelScriptDictionary
 	= new Dictionary<string, string> {
@@ -79,7 +91,7 @@ public static class Global {
 
 	public static float ShowDialogTimeBlock = 3f;
 
-	public static float TextShowYRan = 1f;
+	public static float TextShowYRan = 0.33f;
 
 	public static float MAX_FLOAT15 = Mathf.Pow( 2f , 15f );
 

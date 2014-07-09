@@ -25,6 +25,8 @@ public class BLogicManager : MonoBehaviour {
 		}
 	}
 
+	public bool heroEnableMove = true;
+
 	void Awake()
 	{
 //		InvokeRepeating( "test" , 2f , 3f );
@@ -44,6 +46,8 @@ public class BLogicManager : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMouseClick ,OnMouseClick );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShowText ,OnShowText );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShowTips ,OnShowTips );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnFreezen ,OnFreezen );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnUnfreezen ,OnUnfreezen );
 
 	}
 	
@@ -51,6 +55,27 @@ public class BLogicManager : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMouseClick, OnMouseClick);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShowText ,OnShowText );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShowTips ,OnShowTips );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnFreezen ,OnFreezen );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnUnfreezen ,OnUnfreezen );
+	}
+
+	public void OnFreezen(EventDefine eventName, object sender, EventArgs args)
+	{
+		//shrink the body
+		MessageEventArgs msg1 = new MessageEventArgs();
+		msg1.AddMessage("isLeft" , Boolean.TrueString );
+		BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg1 );
+		MessageEventArgs msg2 = new MessageEventArgs();
+		msg2.AddMessage("isLeft" , Boolean.FalseString );
+		BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg2 );
+
+		//unable to move 
+		heroEnableMove = false;
+	}
+	
+	public void OnUnfreezen(EventDefine eventName, object sender, EventArgs args)
+	{
+		heroEnableMove = true;
 	}
 
 	public void OnShowTips(EventDefine eventName, object sender, EventArgs args)
@@ -73,8 +98,8 @@ public class BLogicManager : MonoBehaviour {
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
 		string text = "";
-		float showTime = 2f;
-		float disappearTime = 3f;
+		float showTime = Global.TextShowTime;
+		float disappearTime = Global.TextDisappearTime;
 		if ( msg.ContainMessage("text") )
 			text = msg.GetMessage("text");
 		if ( msg.ContainMessage("showTime"))
@@ -93,23 +118,26 @@ public class BLogicManager : MonoBehaviour {
 	{
 		// Debug.Log("on mouse click");
 		MessageEventArgs msg = (MessageEventArgs)args;
-		if ( Global.MouseLeft.Equals( msg.GetMessage("type")))
+
+		if ( heroEnableMove )
 		{
-			msg.AddMessage("isLeft", Boolean.TrueString );
-			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
+			if ( Global.MouseLeft.Equals( msg.GetMessage("type")))
+			{
+				msg.AddMessage("isLeft", Boolean.TrueString );
+				BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
+			}
+			
+			if ( Global.MouseRight.Equals( msg.GetMessage("type")))
+			{
+	//			msg.AddMessage("isLeft", Boolean.FalseString );
+	//			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
+				msg.AddMessage("isLeft" , Boolean.FalseString );
+				BEventManager.Instance.PostEvent( EventDefine.OnChangeForce , args );
+			}
 		}
-		
-		if ( Global.MouseRight.Equals( msg.GetMessage("type")))
-		{
-//			msg.AddMessage("isLeft", Boolean.FalseString );
-//			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
-			msg.AddMessage("isLeft" , Boolean.FalseString );
-			BEventManager.Instance.PostEvent( EventDefine.OnChangeForce , args );
-		}
-		
 	}
 
-	public void ShowText( string text , float showTime = 2f , float disappearTime = 3f)
+	public void ShowText( string text , float showTime = 3f , float disappearTime = 2f,  bool freezenByText = true )
 	{
 		//create text object
 		GameObject textPrefab = Resources.Load(Global.TextPrefabPath) as GameObject;
@@ -129,19 +157,21 @@ public class BLogicManager : MonoBehaviour {
 
 
 		//set the follow 
-		Vector3 initpos = BObjManager.Instance.Hero.transform.position;
+		Vector3 initpos = BObjManager.Instance.Hero.transform.position ;
 //		Debug.Log( "NumDrawnChara" + textMesh.NumDrawnCharacters() );
 //		Debug.Log( "invOrthoSize" + textMesh.font.largestWidth );
 //		Debug.Log( "textMesh" + textMesh.scale.x );
-		initpos.x -= ( textMesh.NumDrawnCharacters() / 2 * textMesh.font.largestWidth * textMesh.scale.x) / ( 1 -  Global.TextRelativelyRate) / 2f;
+		//initpos.x -= ( textMesh.NumDrawnCharacters() / 2 * textMesh.font.largestWidth * textMesh.scale.x) / ( 1 -  Global.TextFontRate) / 2f;
 		initpos.y += UnityEngine.Random.Range( - Global.TextShowYRan , + Global.TextShowYRan );
-		textObj.transform.position = initpos;
+		textObj.transform.position = initpos + Global.BTextPosition ;
 		BFollowWith follow =  textObj.AddComponent<BFollowWith>();
 		follow.followState = BFollowWith.FollowState.HalfRelatively;
 		follow.RelativelyRate = Global.TextRelativelyRate;
 		follow.UpdateTarget( BObjManager.Instance.Hero );
 
 		//set the effect
+		if ( isTheTailText() )
+			disappearTime *= 3f;
 		Color toCol = textMesh.color;
 		toCol.a = 0;
 		HOTween.To( textMesh 
@@ -152,10 +182,53 @@ public class BLogicManager : MonoBehaviour {
 		           , EaseType.Linear
 		           , showTime );
 
+		//background
+		tk2dSprite[] backs = textObj.GetComponentsInChildren<tk2dSprite>();
+		Debug.Log("In logic manager" + " get " + backs.Length + "sprites " );
+		foreach( tk2dSprite back in backs )
+		{
+			Color backCol = back.color;
+			backCol.a = 0;
+			HOTween.To( back
+			           , disappearTime
+			           , "color"
+			           , backCol
+			           , false
+			           , EaseType.Linear
+			           , showTime );
+		}
+
+
 		//auto destory
 		AutoDestory destory = textObj.AddComponent<AutoDestory>();
 		destory.destroyTime = showTime + disappearTime;
 		destory.StartAutoDestory();
+
+		//freezen the hero
+		BEventManager.Instance.PostEvent( EventDefine.OnFreezen , new EventArgs());
+		Debug.Log("Freezen");
+		//call unfreezen
+		if ( !freezenByText )
+		{
+			float unfreezenTime = showTime + disappearTime + Time.deltaTime;
+			Invoke( "ShowTextEnd" , unfreezenTime);
+		}else if ( isTheTailText() )
+		{
+			float unfreezenTime = showTime + Time.deltaTime;
+			Invoke( "ShowTextEnd" , unfreezenTime);
+
+		}
+	}
+
+	public bool isTheTailText()
+	{
+		return texts.Count <= 0 ;
+	}
+
+	public void ShowTextEnd(  )
+	{
+		BEventManager.Instance.PostEvent( EventDefine.OnUnfreezen , new EventArgs()) ;
+		Debug.Log("Unfreezen");
 	}
 
 	public void ShowTips( string text , float showTime = 2f , float disappearTime = 3f)

@@ -1,10 +1,23 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class BLevel : MonoBehaviour {
 	public string levelName;
-	
+
+	virtual public void showNextDialogGroup()
+	{
+		List<string> texts = BDataManager.Instance.getNextDialogGroup( levelName );
+		if ( texts == null || texts.Count <= 0 )
+			return;
+		for ( int i = 0 ; i < texts.Count ; ++i )
+		{
+			showText( texts[i] , true , Global.TextShowTime , Global.TextDisappearTime );
+		}
+	}
+
+
 	virtual public void showNextDialog( int n )
 	{
 		for ( int i = 0 ;i < n ; ++ i )
@@ -12,6 +25,8 @@ public class BLevel : MonoBehaviour {
 			showNextDialog();
 		}
 	}
+
+
 	virtual public void showNextDialog(){
 		Debug.Log("BLevel showNextDialog");
 		MessageEventArgs msg = new MessageEventArgs();

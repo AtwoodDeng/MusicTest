@@ -24,6 +24,18 @@ public class BDataManager : MonoBehaviour {
 		return tempLevelScript.getNextDialog(lan , true);
 	}
 
+	public List<string> getNextDialogGroup(string levelName , string lan = null )
+	{
+		if ( lan == null )
+			lan = language;
+		if ( !levelName.Equals(tempLevelScript.levelName) )
+		{
+			TextAsset text = Resources.Load( Global.LevelScriptDictionary[levelName] ) as TextAsset;
+			tempLevelScript.init( levelName , text.text );
+		}
+		return tempLevelScript.getNextDialogGroup(lan , true);
+	}
+
 	public string getDialogWithKey(string levelName , string key , string lan = null )
 	{
 		if ( lan == null )
@@ -36,16 +48,30 @@ public class BDataManager : MonoBehaviour {
 		return tempLevelScript.getDialogWithKey( key , lan );
 	}
 
+	public List<string> getDialogsWithKey(string levelName , string key , string lan = null )
+	{
+		if ( lan == null )
+			lan = language;
+		if ( !levelName.Equals(tempLevelScript.levelName) )
+		{
+			TextAsset text = Resources.Load( Global.LevelScriptDictionary[levelName] ) as TextAsset;
+			tempLevelScript.init( levelName , text.text );
+		}
+		return tempLevelScript.getDialogsWithKey( key , lan );
+	}
+
 	public class LevelScript{
 		public string levelName;
 		string[] title;
 		string[][] content;
 
 		int index;
+		int indexGroup;
 
 		public LevelScript(){
 			levelName = "";
 			index = 0;
+			indexGroup = 1;
 		}
 
 		public void init( string _levelName , string text )
@@ -81,6 +107,31 @@ public class BDataManager : MonoBehaviour {
 			return res;
 		}
 
+		public List<string> getNextDialogGroup( string language , bool isPlusIndex = false)
+		{
+			List<string> res = getDialogsWithKey( indexGroup.ToString()  , language );
+			if ( res == null || res.Count <= 0 )
+			{
+				findNextIndexGroup(language);
+				res = getDialogsWithKey( indexGroup.ToString()  , language );
+			}
+			if ( isPlusIndex )
+				findNextIndexGroup(language);
+
+			return res;
+		}
+		public void findNextIndexGroup( string lan )
+		{
+			indexGroup++;
+			while ( true ) 
+			{	
+				List<string> next = getDialogsWithKey( indexGroup.ToString() , lan );
+				if ( next != null && next.Count > 0 )
+					break;
+				indexGroup++;
+			}
+		}
+
 		public string getDialogWithKey( string key ,  string language )
 		{
 				
@@ -104,6 +155,41 @@ public class BDataManager : MonoBehaviour {
 			return content[i][j];
 
 		}
+
+		public List<string> getDialogsWithKey( string key ,  string language )
+		{
+			
+			int i,j;
+			language.ToUpper();
+			for ( j = 0 ; j < title.Length  ; ++ j )
+				if ( language.Equals(title[j]))
+					break;
+			if ( j >= title.Length )
+				return null;
+
+			if ( string.IsNullOrEmpty(language) || string.IsNullOrEmpty(key))
+				return null;
+
+			List<string> res = new List<string>();
+
+			for ( i = 0 ; i < content.Length  ; ++ i )
+				if ( key.Equals(content[i][Global.LevelScriptKeyIndex]))
+				{
+					if ( content[i][j] == null || content[i][j].Length <= 0 )
+					{
+						//do not add
+					}else
+					{		
+						res.Add( content[i][j] );
+					
+					}
+				}
+
+			return res;
+			
+		}
+
+
 
 	}
 

@@ -20,6 +20,11 @@ public class HeroBody : MonoBehaviour {
 	public float advoidIntense = 1.0f;
 	public float MAXAdvoidForce = 5.0f;
 
+	public float MAXFreezenSpeed = 0.05f;
+	public float freezenDragMutiply = 200f;
+	private float dragOrignal = 0f;
+	private float angularDragOrignal = 0f;
+
 	public HeroHand.ForceType tempForceType = HeroHand.ForceType.SpinCW;
 
 	public class HandGroup{
@@ -124,6 +129,11 @@ public class HeroBody : MonoBehaviour {
 		AddHand(true);
 		AddHand(false);
 		meshCollider = GetComponent<MeshCollider>();
+		if ( rigidbody )
+		{
+			dragOrignal = rigidbody.drag;
+			angularDragOrignal = rigidbody.angularDrag;
+		}
 	}
 
 
@@ -132,6 +142,8 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMoveHand, OnMoveHand);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnChangeForce, OnChangeForce);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnFreezen, OnFreezen);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnUnfreezen, OnUnfreezen);
 //		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
 
 	}
@@ -141,6 +153,8 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShrinkHand, OnShrinkHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMoveHand, OnMoveHand);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnChangeForce, OnChangeForce);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnFreezen, OnFreezen);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnUnfreezen, OnUnfreezen);
 //		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
 	}
 //
@@ -187,6 +201,22 @@ public class HeroBody : MonoBehaviour {
 //
 //
 //	}
+
+	public void OnFreezen(EventDefine eventName, object sender, EventArgs args)
+	{
+		//stay
+		if ( rigidbody.velocity.sqrMagnitude > MAXFreezenSpeed )
+			rigidbody.velocity = rigidbody.velocity.normalized * MAXFreezenSpeed;
+		rigidbody.drag = dragOrignal * freezenDragMutiply;
+		rigidbody.angularDrag = angularDragOrignal * freezenDragMutiply;
+	}
+
+	public void OnUnfreezen(EventDefine eventName, object sender, EventArgs args)
+	{
+		rigidbody.drag = dragOrignal;
+		rigidbody.angularDrag = angularDragOrignal;
+	}
+
 	public void OnChangeForce(EventDefine eventName, object sender, EventArgs args)
 	{
 		if ( tempForceType == HeroHand.ForceType.SpinAntiCW )

@@ -6,6 +6,11 @@ public class begin : MonoBehaviour {
 
 	public List<GameObject> buttons;
 	public FollowCamera follow;
+	
+	public ParticleSystem switchPS;
+	public float delay = 2f;
+	private string nextSenceName;
+	public bool enableSwitchScene = true;
 
 	void Awake()
 	{
@@ -49,6 +54,22 @@ public class begin : MonoBehaviour {
 		Debug.Log("hover " + level );
 		if ( buttons.Count > level )
 			follow.target = buttons[level];
+	}
+
+	void OnLevel1()
+	{
+		if ( enableSwitchScene )
+		{
+			switchPS.enableEmission = true;
+			nextSenceName = "KafakaLV1";
+			enableSwitchScene = false;
+			Invoke( "gotoNextSence" ,delay );
+		}
+	}
+
+	void gotoNextSence()
+	{
+		Application.LoadLevel( nextSenceName );
 	}
 }
 

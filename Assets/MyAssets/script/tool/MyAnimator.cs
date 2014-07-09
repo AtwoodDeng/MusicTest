@@ -3,16 +3,24 @@ using System.Collections;
 using System.Collections.Generic;
 using Holoville.HOTween;
 
-[RequireComponent(typeof(tk2dSprite))]
 public class MyAnimator : MonoBehaviour {
+
+	public enum ShowType
+	{
+		Merge,
+		Switch,
+	}
+	public ShowType showType;
 
 	public List<float> timeLine;
 	public List<float> fadeTimeIn;
 	public List<float> fadeTimeOut;
 	public List<string> spriteNames;
+	//public List<string> extraSpriteNames;
 	//public string collectionName;
 
 	public tk2dSprite sprite;
+	public tk2dSprite extraSprite;
 	private int index = 0 ;
 
 	private float time = -0.01f;
@@ -37,10 +45,15 @@ public class MyAnimator : MonoBehaviour {
 	void Awake() {
 		if ( sprite == null )
 			sprite = this.GetComponent<tk2dSprite>();
-		if ( spriteNames.Count <= 0 )
-			return;
-		tempSpriteName = spriteNames[index];
-		sprite.SetSprite( tempSpriteName );
+		if ( spriteNames.Count > 0 )
+		{
+			tempSpriteName = spriteNames[index];
+			sprite.SetSprite( tempSpriteName );
+		}
+//		if ( extraSpriteNames.Count > 0 && extraSprite != null )
+//		{
+//			extraSprite.SetSprite( extraSpriteNames[index] );
+//		}
 
 		if ( ifPlayOnAwake )
 			StartPlay();
@@ -75,40 +88,97 @@ public class MyAnimator : MonoBehaviour {
 		{
 			Debug.LogError("[MyAnimator] index out of range");
 		}
-		tempTime = timeLine[index];
-		float fadeInTime = fadeTimeIn[index];
-		float fadeOutTime = fadeTimeOut[index];
-		tempSpriteName = spriteNames[index];
 
 
-		sprite.SetSprite(tempSpriteName);
+//		if ( extraSpriteNames.Count > index && extraSprite != null )
+//		{
+//			extraSprite.SetSprite( extraSpriteNames[index] );
+//		}
 
-		if ( fadeInTime + fadeOutTime > tempTime )
-			fadeInTime = fadeOutTime = tempTime / 2;
+		//set animater of sprite
+		if ( showType == ShowType.Switch )
+		{
+			tempTime = timeLine[index];
+			float fadeInTime = fadeTimeIn[index];
+			float fadeOutTime = fadeTimeOut[index];
+			
+			sprite.SetSprite(spriteNames[index]);
 
-		Color colorIn = sprite.color;
-		Color colorOut = colorIn;
-		colorIn.a = 1f;
-		colorOut.a = 0f;
+			if ( fadeInTime + fadeOutTime > tempTime )
+				fadeInTime = fadeOutTime = tempTime / 2;
 
-		sprite.color = colorOut;
+			Color colorIn = sprite.color;
+			Color colorOut = colorIn;
+			if ( fadeOutTime > 0 )
+				colorOut.a = 0f;
 
-		HOTween.To( sprite ,
-		           fadeInTime ,
-		           "color" ,
-		           colorIn ,
-		           false ,
-		           fadeInEaseType ,
-		           0 );
+			if ( fadeInTime > 0 )
+			{
+				Color colorBI = sprite.color;
+				colorBI.a = 0;
+				sprite.color = colorBI;
+				colorIn.a = 1f;
+			}
 
-		HOTween.To( sprite ,
-		           fadeOutTime ,
-		           "color" ,
-		           colorOut ,
-		           false ,
-		           fadeOutEaseType ,
-		           tempTime - fadeOutTime );
+			//sprite.color = colorOut;
 
+			HOTween.To( sprite ,
+			           fadeInTime ,
+			           "color" ,
+			           colorIn ,
+			           false ,
+			           fadeInEaseType ,
+			           0 );
+
+			HOTween.To( sprite ,
+			           fadeOutTime ,
+			           "color" ,
+			           colorOut ,
+			           false ,
+			           fadeOutEaseType ,
+			           tempTime - fadeOutTime );
+		}
+
+		if ( showType == ShowType.Merge &&  extraSprite != null )
+		{
+			tempTime = timeLine[index];
+			float fadeInTime = fadeTimeIn[index];
+//			float fadeOutTime = fadeTimeOut[index];
+			tempSpriteName = spriteNames[index];
+			
+//			if ( fadeInTime + fadeOutTime > tempTime )
+//				fadeInTime = fadeOutTime = tempTime / 2;
+			if ( fadeInTime > tempTime )
+				fadeInTime = tempTime;
+
+			extraSprite.SetSprite( sprite.spriteId );
+			sprite.SetSprite( spriteNames[index] );
+
+			Color colorIn = sprite.color;
+			Color colorOut = colorIn;
+			colorIn.a = 1f;
+			colorOut.a = 0;
+
+			sprite.color = colorOut;
+			extraSprite.color = colorIn;
+			
+			HOTween.To( sprite ,
+			           fadeInTime ,
+			           "color" ,
+			           colorIn ,
+			           false ,
+			           fadeInEaseType ,
+			           0 );
+			
+			HOTween.To( extraSprite ,
+			           fadeInTime ,
+			           "color" ,
+			           colorOut ,
+			           false ,
+			           fadeOutEaseType ,
+			           0 );
+
+		}
 
 	}
 

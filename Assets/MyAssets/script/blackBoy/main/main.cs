@@ -2,16 +2,43 @@
 using System.Collections;
 
 public class main : MonoBehaviour {
+	
+	public ParticleSystem switchPS;
+	public float delay = 2f;
+	private string nextSenceName;
+	public bool enableSwitchScene = true;
+
+	void Awake()
+	{
+		enableSwitchScene = true;
+	}
 
 	void OnBegin()
 	{
-		Debug.Log("begin");
-		//Application.LoadLevel("aa");
+		if ( enableSwitchScene )
+		{
+			switchPS.enableEmission = true;
+			nextSenceName = "begin";
+			enableSwitchScene = false;
+			Invoke( "gotoNextSence" ,delay );
+		}
 	}
+
 
 	void OnCollection()
 	{
-		Debug.Log("collection");
+		if ( enableSwitchScene )
+		{
+			switchPS.enableEmission = true;
+			nextSenceName = "collection";
+			enableSwitchScene = false;
+			Invoke( "gotoNextSence" ,delay );
+		}
+	}
+	
+	void gotoNextSence()
+	{
+		Application.LoadLevel( nextSenceName );
 	}
 }
 

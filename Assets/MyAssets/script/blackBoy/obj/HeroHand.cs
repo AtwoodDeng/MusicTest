@@ -109,8 +109,6 @@ public class HeroHand : MonoBehaviour {
 
 		if ( CheckLength())
 			Shrink();
-
-
 	}
 
 	public void setRotationToward( Vector3 toward )
@@ -124,7 +122,7 @@ public class HeroHand : MonoBehaviour {
 	
 	public bool CheckLength()
     {
-			return transform.localPosition.sqrMagnitude > MaxLength;
+		return transform.localPosition.sqrMagnitude > MaxLength;
 	}
 
 	public void Init( HeroBody body , HeroArm arm) {

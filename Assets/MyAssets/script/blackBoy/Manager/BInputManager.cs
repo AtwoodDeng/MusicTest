@@ -8,6 +8,7 @@ public class BInputManager : MonoBehaviour {
 
 	Camera mainCamera;
 
+
 	// Update is called once per frame
 	void Update () {
 
@@ -28,6 +29,15 @@ public class BInputManager : MonoBehaviour {
 		Free
 	}
 	public MouseState state;
+	public enum CursorState
+	{
+		Free,
+		PointCatch,
+		PointCW,
+		PointACW,
+	}
+	public CursorState cursorState;
+
 	public Vector3 MousePosition
 	{
 		get{
@@ -40,9 +50,56 @@ public class BInputManager : MonoBehaviour {
 
 	void DealCursor()
 	{
-		
 		Screen.showCursor = false;
 
+		CursorState oriState = cursorState;
+		updateCursorState();
+
+		if ( oriState != cursorState || cursor == null )
+		{
+			updateCursorObj();
+		}
+
+		updateCursorPos();
+	}
+
+	void updateCursorState()
+	{
+		if ( state == MouseState.Free )
+			cursorState = CursorState.Free;
+		if ( state == MouseState.Point || state == MouseState.Drag )
+		{
+			if ( cursorState == CursorState.Free )
+			{
+				if ( Input.GetMouseButton(Global.MouseLeftInt) )
+				{
+					cursorState = CursorState.PointCatch;
+				}else if ( Input.GetMouseButton(Global.MouseRightInt) )
+				{
+					if ( BObjManager.Instance.BHeroBody.tempForceType == HeroHand.ForceType.SpinAntiCW )
+					{
+						cursorState = CursorState.PointCW;
+					}else
+					{
+						cursorState = CursorState.PointACW;
+					}
+				}
+			}
+		}
+	}
+
+	void updateCursorObj()
+	{
+		if ( cursor != null )
+			Destroy( cursor );
+		GameObject prefab = Resources.Load(Global.CursorDict[cursorState.ToString()]) as GameObject;
+		cursor = Instantiate( prefab ) as GameObject;
+
+		updateCursorPos();
+	}
+
+	void updateCursorPos()
+	{
 		if (cursor != null )
 			cursor.transform.localPosition = new Vector3( mousePos.x ,mousePos.y, Global.BCursorPosition.z);
 	}
