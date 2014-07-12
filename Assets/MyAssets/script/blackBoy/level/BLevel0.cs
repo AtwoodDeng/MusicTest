@@ -11,7 +11,11 @@ public class BLevel0 : BLevel {
 
 	public override void DealWith (float deltaTime)
 	{
-
+		switch( state )
+		{
+		case State.Init:
+			break;
+		}
 	}
 
 	public override void DealTrigger (string msg)

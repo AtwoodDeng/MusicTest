@@ -67,6 +67,17 @@ public class begin : MonoBehaviour {
 		}
 	}
 
+	void OnLevel0()
+	{
+		if ( enableSwitchScene )
+		{
+			switchPS.enableEmission = true;
+			nextSenceName = "KafakaLV0";
+			enableSwitchScene = false;
+			Invoke( "gotoNextSence" ,delay );
+		}
+	}
+
 	void gotoNextSence()
 	{
 		Application.LoadLevel( nextSenceName );
