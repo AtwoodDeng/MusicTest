@@ -12,6 +12,7 @@ public class BLogicManager : MonoBehaviour {
 
 
 	List<TextContent> texts = new List<TextContent>();
+	List<TextContent> tips = new List<TextContent>();
 
 	public class TextContent{
 		public string text;
@@ -62,15 +63,30 @@ public class BLogicManager : MonoBehaviour {
 	public void OnFreezen(EventDefine eventName, object sender, EventArgs args)
 	{
 		//shrink the body
-		MessageEventArgs msg1 = new MessageEventArgs();
-		msg1.AddMessage("isLeft" , Boolean.TrueString );
-		BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg1 );
-		MessageEventArgs msg2 = new MessageEventArgs();
-		msg2.AddMessage("isLeft" , Boolean.FalseString );
-		BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg2 );
+		MessageEventArgs msg = (MessageEventArgs)args;
+		if (  msg.ContainMessage( "ifShrink" ) && msg.GetMessage( "ifShrink" ).Equals( Boolean.TrueString ))
+		{
+			MessageEventArgs msg1 = new MessageEventArgs();
+			msg1.AddMessage("isLeft" , Boolean.TrueString );
+			BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg1 );
+			MessageEventArgs msg2 = new MessageEventArgs();
+			msg2.AddMessage("isLeft" , Boolean.FalseString );
+			BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg2 );
+		}
 
+		if ( msg.ContainMessage( "time" ))
+		{
+			float time = float.Parse( msg.GetMessage( "time" ));
+			Invoke( "Unfreezen" , time );
+		}
 		//unable to move 
 		heroEnableMove = false;
+	}
+
+	public void Unfreezen()
+	{
+		BEventManager.Instance.PostEvent( EventDefine.OnUnfreezen , new EventArgs()) ;
+
 	}
 	
 	public void OnUnfreezen(EventDefine eventName, object sender, EventArgs args)
@@ -90,7 +106,7 @@ public class BLogicManager : MonoBehaviour {
 			showTime = float.Parse( msg.GetMessage("showTime"));
 		if ( msg.ContainMessage("disappearTime"))
 			disappearTime = float.Parse( msg.GetMessage("disappearTime"));
-		ShowTips( text , showTime , disappearTime );
+		tips.Add( new TextContent( text , showTime , disappearTime ));
 		
 	}
 
@@ -205,7 +221,9 @@ public class BLogicManager : MonoBehaviour {
 		destory.StartAutoDestory();
 
 		//freezen the hero
-		BEventManager.Instance.PostEvent( EventDefine.OnFreezen , new EventArgs());
+		MessageEventArgs msg = new MessageEventArgs();
+		msg.AddMessage( "isShrink", Boolean.TrueString );
+		BEventManager.Instance.PostEvent( EventDefine.OnFreezen , new MessageEventArgs());
 		Debug.Log("Freezen");
 		//call unfreezen
 		if ( !freezenByText )
@@ -269,7 +287,7 @@ public class BLogicManager : MonoBehaviour {
 		           , disappearTime
 		           , "color"
 		           , toCol
-		           , false
+		           , false 
 		           , EaseType.Linear
 		           , showTime );
 		
@@ -277,13 +295,18 @@ public class BLogicManager : MonoBehaviour {
 		AutoDestory destory = tipsObj.AddComponent<AutoDestory>();
 		destory.destroyTime = showTime + disappearTime;
 		destory.StartAutoDestory();
+
+		//freezen
+		BEventManager.Instance.PostEvent( EventDefine.OnFreezen , new MessageEventArgs() );
+
+		if ( tips.Count <= 0 )
+			BEventManager.Instance.PostEvent( EventDefine.OnUnfreezen , new MessageEventArgs () );
 	}
 
-
-	
 	void Update()
 	{
 		DealDialogs(Time.deltaTime);
+		DealTips(Time.deltaTime);
 	}
 
 
@@ -297,6 +320,19 @@ public class BLogicManager : MonoBehaviour {
 			texts.RemoveAt( 0 );
 			showDialogCounter = tc.showTime + tc.disappearTime / 3 ;
 			ShowText( tc.text , tc.showTime , tc.disappearTime );
+		}
+	}
+
+	float showTipsCounter = 0;
+	void DealTips( float deltaTime )
+	{
+		showTipsCounter -= deltaTime;
+		if ( tips.Count > 0 && showTipsCounter < 0 )
+		{
+			TextContent tc = tips[0]; 
+			tips.RemoveAt( 0 );
+			showTipsCounter = tc.showTime + tc.disappearTime / 3 ;
+			ShowTips( tc.text , tc.showTime , tc.disappearTime );
 		}
 	}
 

@@ -11,6 +11,7 @@ public class Triggerable : MonoBehaviour {
 	public bool isSendMessage = false;
 	public bool isDestroyOnEnter = false ;
 	public bool isBarrier = false;
+	public GameObject DestoryEffect;
 
 	public Vector3 barrierDirection ;
 	//public float barrierVelocityLimit = 2f;
@@ -27,6 +28,13 @@ public class Triggerable : MonoBehaviour {
 	{
 		if ( senseTags.Contains( collider.tag ))
 		{
+			if ( isSendMessage )
+			{
+				MessageEventArgs msg = new MessageEventArgs();
+				msg.AddMessage("msg" , message );
+				BEventManager.Instance.PostEvent( EventDefine.OnTriggerable , msg );
+			}
+
 			if ( isBarrier )
 			{
 				if ( collider.gameObject.rigidbody != null )
@@ -37,22 +45,33 @@ public class Triggerable : MonoBehaviour {
 					collider.gameObject.rigidbody.AddForce( barrierDirection.normalized * barrierIntense , ForceMode.Impulse);
 
 				}
+
 			}else
 			{
 				obj = collider.gameObject;
-				if ( isSendMessage )
-				{
-					MessageEventArgs msg = new MessageEventArgs();
-					msg.AddMessage("msg" , message );
-					BEventManager.Instance.PostEvent( EventDefine.OnTriggerable , msg );
-				}
+
 				if ( isDestroyOnEnter )
 				{
 					AutoDestory autoDestory = gameObject.AddComponent<AutoDestory>();
 					autoDestory.destroyTime = Global.ObjDestroyTime;
 					autoDestory.isFadeOut = true;
+					autoDestory.isStopParticle = true;
 					autoDestory.StartAutoDestory();
 					isDestroyOnEnter = false;
+
+					if ( DestoryEffect != null )
+					{
+						GameObject Deffect = Instantiate ( DestoryEffect ) as GameObject;
+						Deffect.transform.position = gameObject.transform.position;
+//						AutoDestory DDestory = Deffect.AddComponent<AutoDestory>();
+//						autoDestory.destroyTime = Global.ObjDestroyTime;
+//						autoDestory.isStopParticle = true;
+//						autoDestory.StartAutoDestory();
+
+					}
+
+					isSendMessage = false;
+					isBarrier = false;
 				}
 			}
 		}

@@ -46,12 +46,19 @@ public class BLevel : MonoBehaviour {
 
 		BEventManager.Instance.PostEvent( EventDefine.OnShowText , msg );
 	}
+	
+	virtual public void showTipsByKey( string key )
+	{
+		List<string> tips = BDataManager.Instance.getDialogsWithKey( levelName , key );
+		for ( int i = 0 ; i < tips.Count ; ++ i )
+			showTips( tips[i] );
 
+	}
 	virtual public void showTips( string text , float showTime =3f , float disTime = 4f ){
 		MessageEventArgs msg = new MessageEventArgs();
 		msg.AddMessage( "text" , text );
-		msg.AddMessage("showTime" , showTime.ToString());
-		msg.AddMessage("disappearTime" , disTime.ToString());
+		msg.AddMessage("showTime" , Global.TipsShowTime.ToString() );
+		msg.AddMessage("disappearTime" , Global.TipsDisappearTime.ToString());
 		
 		BEventManager.Instance.PostEvent( EventDefine.OnShowTips , msg );
 	}

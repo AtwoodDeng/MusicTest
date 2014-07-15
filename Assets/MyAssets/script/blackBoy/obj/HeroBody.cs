@@ -120,6 +120,16 @@ public class HeroBody : MonoBehaviour {
 			}
 			return null;
 		}
+
+		public Catchable getCatchable()
+		{
+			foreach( HeroHand hand in hands )
+			{
+				if ( hand.stayObjCatchable != null )
+					return hand.stayObjCatchable;
+			}
+			return null;
+		}
 	}
 
 	void Start()

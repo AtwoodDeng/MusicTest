@@ -181,7 +181,6 @@ public class BDataManager : MonoBehaviour {
 					}else
 					{		
 						res.Add( content[i][j] );
-					
 					}
 				}
 

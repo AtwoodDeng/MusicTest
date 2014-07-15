@@ -6,13 +6,14 @@ public class Catchable : MonoBehaviour {
 
 	private int ID = -1;
 	protected string HandID;
+	public float forceIntense = 0.03f;
 
 	public enum ForceType
 	{
 		Out,
 		In,
 	}
-	public ForceType forceType;
+	public ForceType forceType = ForceType.In;
 
 	// Use this for initialization
 
@@ -56,6 +57,11 @@ public class Catchable : MonoBehaviour {
 		MessageEventArgs msg = (MessageEventArgs)args;
 		if ( HandID != null && HandID.Equals( msg.GetMessage("HandID") ))
 			DealShrink(msg);
+	}
+
+	virtual public Vector3 getForceMain( Vector3 toBody )
+	{
+		return forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / toBody.magnitude;
 	}
 
 	virtual public void  DealCatch(MessageEventArgs msg){}

@@ -202,9 +202,10 @@ public class HeroHand : MonoBehaviour {
 	public void Catch( GameObject _stayObj )
 	{
 		
-		//Debug.Log("catch " + state );
+		Debug.Log("catch out " + state );
 		if ( state == HandState.Fly )
 		{
+			Debug.Log("Catch in");
 			stayObj = _stayObj;
 
 			if ( stayAdhereObj != null )
@@ -214,7 +215,7 @@ public class HeroHand : MonoBehaviour {
 			}
 			rigidbody.velocity = Vector3.zero;
 			state = HandState.Catch;
-			
+
 			SetForceType( forceType );
 			CreateCatchEffect( stayPos );
 
@@ -276,21 +277,27 @@ public class HeroHand : MonoBehaviour {
 	public Vector3 getForceMain()
 	{
 		Vector3 toBody = heroBody.transform.position - transform.position;
-		
-		if ( forceType == ForceType.Pull )
-			return forceIntense * ( - toBody );
-		else if ( forceType == ForceType.SpinAntiCW )
+
+		if ( stayObjCatchable != null )
 		{
-			Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
-			//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude);
-			//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude);
-			return force;
-		}else if ( forceType == ForceType.SpinCW )
+			return stayObjCatchable.getForceMain( toBody );
+		}else
 		{
-			Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
-			//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude );
-			//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude );
-			return force;
+			if ( forceType == ForceType.Pull )
+				return forceIntense * ( - toBody );
+			else if ( forceType == ForceType.SpinAntiCW )
+			{
+				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
+				//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude);
+				//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude);
+				return force;
+			}else if ( forceType == ForceType.SpinCW )
+			{
+				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
+				//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude );
+				//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude );
+				return force;
+			}
 		}
 
 
@@ -399,7 +406,7 @@ public class HeroHand : MonoBehaviour {
 	{
 //		if ( forceType == toForceType )
 //			return ;
-		Debug.Log("SetForceType" + " from " + forceType + " to " + toForceType );
+//		Debug.Log("SetForceType" + " from " + forceType + " to " + toForceType );
 
 		catchEffectPrefab =  Resources.Load( Global.HandCatchEffectDict [ toForceType.ToString() ] ) as GameObject;
 
@@ -410,7 +417,7 @@ public class HeroHand : MonoBehaviour {
 			destory.destroyTime = 3f;
 			destory.StartAutoDestory();
 		}
-		Debug.Log( "stayAdhereObj" + stayAdhereObj + "stat " + state );
+//		Debug.Log( "stayAdhereObj" + stayAdhereObj + "stat " + state );
 		if ( stayAdhereObj != null && state == HandState.Catch )
 		{
 
@@ -476,7 +483,6 @@ public class HeroHand : MonoBehaviour {
 
 	public Vector3 getForceSecond()
 	{
-		
 		if ( state == HandState.Catch )
 		{
 			float direct = -1f;
@@ -494,6 +500,21 @@ public class HeroHand : MonoBehaviour {
 			}
 			Vector3 toBody = heroBody.transform.position - transform.position;
 			return direct * forceIntense * toBodyForceRate * toBody ;
+
+
+//			///get force v
+//			Vector3 radius = heroBody.transform.position - stayObj.transform.position;
+//			Vector3 velocity = heroBody.rigidbody.velocity;
+//			Vector3 velocityN = radius.normalized * Vector3.Dot( radius.normalized , velocity );
+//			Vector3 VelocityT = velocity - velocityN;
+//
+//			
+//			Vector3 forceV = - radius.normalized * VelocityT.magnitude / radius.sqrMagnitude * rigidbody.mass * Global.A2FRate ;
+//
+//			
+//			GUIDebug.add( ShowType.label , " force v r=" + radius + " v=" + velocity + "force v " );
+//
+//			return forceV;
 
 		}
 		return Vector3.zero;
@@ -518,9 +539,9 @@ public class HeroHand : MonoBehaviour {
 
 	void OnTriggerEnter( Collider collider )
 	{
-//		Debug.Log("trigger enter " + collider.gameObject.name + " " + collider.gameObject.tag );
 		if ( state == HandState.Fly )
 		{
+			Debug.Log("trigger enter " + collider.gameObject.name + " " + collider.gameObject.tag );
 			if ( Global.HandStayTag.Equals( collider.gameObject.tag ))
 			{
 				Catch( collider.gameObject );

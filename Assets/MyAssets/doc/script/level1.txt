@@ -1,3 +1,80 @@
+level0:
+
+======
+0
+"One day, you will murder your father, sleep with your mother, and get into your sister's body."
+That's my father's word.
+1
+========
+1
+"So, you have made your mind to run away from home." say the Crow.
+
+"Yes, I'll leave on my 15th birthday." I answer.
+2
+========
+2
+"So you're all set for money, right?" say the Crow.
+
+I nod my head.
+
+"How much do you totally have?" the Crow ask.
+
+"Not a lot, but it should be enough.
+ For the time being" I answer.
+3
+
+("What about the money" doubt Crow, "Did you think of it?"
+
+"I'll get it from my father. But I need more time." I tell him.
+
+"Do you mean 'steal' ?" said the Crow.)
+
+========
+?
+========
+3
+"Then, what about the future?" say Crow,
+ " You're only fifteen. 
+ You're under age. 
+ No one will hire you. 
+ You can not even support your self."
+4
+=========
+4
+"Yes, I know it's tough." I say,
+"Everything is tough here. 
+But I have get out of here. 
+I have no choice. I have to go!"
+5
+=========
+5
+"OK. Calm down." said Crow,"How about play our game?"
+
+"All right" I say. I close my eyes.
+6
+
+"picture a terrible sandstorm," he says."Sometimes fate is like a small sandstorm that keeps chasing you. You change your directions and it adjusts. You can never advoid it because this storm is not something that blew in from far away. This storm is you. So all you can do is give in to it, step right inside the storm, and walk through it, step by step. There's no light there, no friend, no guide, no sense of time."
+
+
+========
+
+7
+
+The boy named Crow softly rests a hand on my shoulder, "From now on you must be the world's strongest fifteen-year-old. To survive, to fight, to win. Remember you can never get rid of the fate."
+
+I didn't answer. And Crow faded away.
+
+
+
+============
+
+["Money will never be enough. I mean, what about the future? You're only fifteen.  No one will hire you, so you can not even support your self." Crow went on, "Besides, the world is totally unknown outside. There are things you never could imagine."
+"But I have to get out of here," I said to both him and myself. "No second path to go."
+
+"OK. When you decide to run, then run. But always remember, distance can not solve anything. You have to face what you must face."
+
+I didn't answer. And Crow went away.]
+
 
 Level1
 Once again, I wake up from the nightmare. My father's word is repeating in my mind.
