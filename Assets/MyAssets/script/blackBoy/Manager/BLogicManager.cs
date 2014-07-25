@@ -9,6 +9,7 @@ public class BLogicManager : MonoBehaviour {
 	public BLogicManager() { s_Instance = this; }
 	public static BLogicManager Instance { get { return s_Instance; } }
 	private static BLogicManager s_Instance;
+	
 
 
 	List<TextContent> texts = new List<TextContent>();
@@ -27,6 +28,8 @@ public class BLogicManager : MonoBehaviour {
 	}
 
 	public bool heroEnableMove = true;
+
+	private FrontMenu frontMenu;
 
 	void Awake()
 	{
@@ -49,6 +52,9 @@ public class BLogicManager : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShowTips ,OnShowTips );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnFreezen ,OnFreezen );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnUnfreezen ,OnUnfreezen );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnFrontMenu ,OnFrontMenu );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnStop ,OnStop );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnBack ,OnBack );
 
 	}
 	
@@ -58,6 +64,35 @@ public class BLogicManager : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShowTips ,OnShowTips );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnFreezen ,OnFreezen );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnUnfreezen ,OnUnfreezen );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnFrontMenu ,OnFrontMenu );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnStop ,OnStop );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnBack ,OnBack );
+	}
+
+	public void OnStop(EventDefine eventName, object sender, EventArgs args)
+	{
+		heroEnableMove = false;
+	}
+
+	public void OnBack(EventDefine eventName, object sender, EventArgs args)
+	{
+		heroEnableMove = true;
+	}
+
+	public void OnFrontMenu(EventDefine eventName, object sender, EventArgs args)
+	{
+		if ( frontMenu != null )
+		{
+			frontMenu.gameObject.SetActive( true );
+		}else{
+			GameObject frontMenuPrefab = Resources.Load( Global.FrontMenuPath ) as GameObject;
+			GameObject frontMenuObj = Instantiate( frontMenuPrefab ) as GameObject;
+			frontMenuObj.name = Global.FrontMenuName;
+			frontMenuObj.tag = Global.FrontMenuTag;
+			frontMenu = frontMenuObj.GetComponent<FrontMenu>();
+		}
+
+		BEventManager.Instance.PostEvent( EventDefine.OnStop , new MessageEventArgs() );
 	}
 
 	public void OnFreezen(EventDefine eventName, object sender, EventArgs args)

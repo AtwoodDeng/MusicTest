@@ -75,7 +75,11 @@ public static class Global {
 	public static Dictionary<string,string> nextLevelDict
 	= new Dictionary<string, string> {
 		{"level0" , "KafakaLv0_2"}};
-
+	
+	public static string FrontMenuPath = "Tool/Prefab/FrontMenuShow";
+	public static string FrontMenuName = "FrontMenuMainBody";
+	public static string FrontMenuTag = "FRONTMENU";
+	public static Vector3 FrontCursorSize = new Vector3( 0.333f , 0.333f , 0.333f );
 
 	public static float EffectDestroyTime = 5f;
 
@@ -109,6 +113,10 @@ public static class Global {
 	public static float MAX_FLOAT15 = Mathf.Pow( 2f , 15f );
 
 	public static float A2FRate = 1 / 10f ;
+
+	public static float LargeDrag = 99999f;
+	public static float LargeAngleDrag = 99999f;
+
 
 
 }

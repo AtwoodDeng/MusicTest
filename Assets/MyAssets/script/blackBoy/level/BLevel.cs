@@ -65,11 +65,13 @@ public class BLevel : MonoBehaviour {
 
 	protected void OnEnable() {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnTriggerable ,OnTriggerable );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnRestart ,OnRestart );
 		
 	}
 
 	protected void OnDisable() {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnTriggerable, OnTriggerable);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnRestart ,OnRestart );
 	}
 
 	public void OnTriggerable(EventDefine eventName, object sender, EventArgs args)
@@ -83,6 +85,16 @@ public class BLevel : MonoBehaviour {
 	}
 
 	virtual public void DealWith( float deltaTime )
+	{
+	}
+
+	public void OnRestart(EventDefine eventName, object sender, EventArgs args)
+	{
+		MessageEventArgs msg = (MessageEventArgs)args;
+		Restart( msg.GetMessage("msg"));
+	}
+
+	virtual public void Restart( string msg )
 	{
 	}
 

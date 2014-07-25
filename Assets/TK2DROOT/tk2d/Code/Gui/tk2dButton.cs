@@ -82,6 +82,7 @@ public class tk2dButton : MonoBehaviour
 	/// Occurs when button transitions from down to up state
 	/// </summary>
 	public event ButtonHandlerDelegate ButtonUpEvent;
+	public event ButtonHandlerDelegate ButtonHoverEvent;
 	
 	tk2dBaseSprite sprite;
 	bool buttonDown = false;
@@ -209,7 +210,14 @@ public class tk2dButton : MonoBehaviour
 			s = (Time.realtimeSinceStartup - t0);
 		}
 	}
-	
+	IEnumerator coHandleButtonHover( int fingerId )
+	{
+		if ( ButtonHoverEvent != null )
+			ButtonHoverEvent( this );
+
+		yield return 0;
+	}
+
 	IEnumerator coHandleButtonPress(int fingerId)
 	{
 		buttonDown = true; // inhibit processing in Update()
@@ -382,16 +390,23 @@ public class tk2dButton : MonoBehaviour
 		if (!detected)
 #endif
 		{
-			if (Input.GetMouseButtonDown(0))
-	        {
-	            Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
-	            RaycastHit hitInfo;
-	            if (collider.Raycast(ray, out hitInfo, 1.0e8f))
-	            {
-					if (!Physics.Raycast(ray, hitInfo.distance - 0.01f))
+
+            Ray ray = viewCamera.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hitInfo;
+            if (collider.Raycast(ray, out hitInfo, 1.0e8f))
+            {
+				if (!Physics.Raycast(ray, hitInfo.distance - 0.01f))
+				{
+					if (Input.GetMouseButtonDown(0))
+				    {
 						StartCoroutine(coHandleButtonPress(-1));
-	            }
-	        }
+					}else
+					{
+						StartCoroutine( coHandleButtonHover(-1) );
+					}
+				}
+            }
+	        
 		}
 	}
 }

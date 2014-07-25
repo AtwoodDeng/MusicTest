@@ -19,6 +19,7 @@ public enum EventDefine{
 	OnShrink ,
 	OnSpinFinish ,
 	OnPullFinish ,
+	OnRestart,
 
 
 	OnMouseClick ,
@@ -29,5 +30,10 @@ public enum EventDefine{
 	OnFreezen,
 	OnUnfreezen,
 
+	OnStop,
+	OnBack,
+
 	OnFrontMenuBack,
+	OnFrontMenu,
+
 }

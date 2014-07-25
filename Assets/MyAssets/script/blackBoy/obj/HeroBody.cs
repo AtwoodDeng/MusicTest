@@ -154,6 +154,8 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnChangeForce, OnChangeForce);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnFreezen, OnFreezen);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnUnfreezen, OnUnfreezen);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnStop, OnStop);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnBack, OnBack);
 //		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
 
 	}
@@ -165,6 +167,8 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnChangeForce, OnChangeForce);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnFreezen, OnFreezen);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnUnfreezen, OnUnfreezen);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnStop, OnStop);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnBack, OnBack);
 //		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
 	}
 //
@@ -211,14 +215,33 @@ public class HeroBody : MonoBehaviour {
 //
 //
 //	}
-
+	private Vector3 tempVelocity;
+	private Vector3 tempAngleVelocity;
+	public void OnStop(EventDefine eventName, object sender, EventArgs args)
+	{
+		tempVelocity = rigidbody.velocity;
+		tempAngleVelocity = rigidbody.angularVelocity;
+		rigidbody.velocity = Vector3.zero;
+		rigidbody.drag = Global.LargeDrag;
+		rigidbody.angularDrag = Global.LargeAngleDrag;
+	}
+	
+	public void OnBack(EventDefine eventName, object sender, EventArgs args)
+	{
+		rigidbody.velocity = tempVelocity;
+		rigidbody.angularVelocity = tempAngleVelocity;
+		rigidbody.drag = dragOrignal;
+		rigidbody.angularDrag = angularDragOrignal;
+	}
 	public void OnFreezen(EventDefine eventName, object sender, EventArgs args)
 	{
-		//stay
-		if ( rigidbody.velocity.sqrMagnitude > MAXFreezenSpeed )
-			rigidbody.velocity = rigidbody.velocity.normalized * MAXFreezenSpeed;
-		rigidbody.drag = dragOrignal * freezenDragMutiply;
-		rigidbody.angularDrag = angularDragOrignal * freezenDragMutiply;
+
+			//stay
+			if ( rigidbody.velocity.sqrMagnitude > MAXFreezenSpeed )
+				rigidbody.velocity = rigidbody.velocity.normalized * MAXFreezenSpeed;
+			rigidbody.drag = dragOrignal * freezenDragMutiply;
+			rigidbody.angularDrag = angularDragOrignal * freezenDragMutiply;
+
 	}
 
 	public void OnUnfreezen(EventDefine eventName, object sender, EventArgs args)
@@ -452,6 +475,11 @@ public class HeroBody : MonoBehaviour {
 	{
 		if ( WillCollide( collider.gameObject ))
 			AdvoidCollision( collider );
+	}
+
+	public void Restart()
+	{
+		tempAngleVelocity = tempVelocity = Vector3.zero;
 	}
 
 }

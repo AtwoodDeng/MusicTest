@@ -10,6 +10,7 @@ public class SpriteColorChange : MonoBehaviour {
 	public bool ifStartOnAwake;
 	public Color fromColor;
 	public Color toColor;
+	public bool ifInitColor;
 
 	public tk2dSprite sprite;
 	public tk2dTextMesh text;
@@ -34,18 +35,20 @@ public class SpriteColorChange : MonoBehaviour {
 	public void StartPlay() {
 		if ( sprite != null )
 		{
-		sprite.color = fromColor;
-		HOTween.To( sprite ,
-		           fadeInTime ,
-		           "color" ,
-		           toColor ,
-		           false ,
-		           easeType ,
-		           delay );
+			if ( ifInitColor )
+				sprite.color = fromColor;
+			HOTween.To( sprite ,
+			           fadeInTime ,
+			           "color" ,
+			           toColor ,
+			           false ,
+			           easeType ,
+			           delay );
 		}
 		else if ( text != null )
 		{
-			text.color = fromColor;
+			if ( ifInitColor )
+				text.color = fromColor;
 			HOTween.To( text ,
 			           fadeInTime ,
 			           "color" ,

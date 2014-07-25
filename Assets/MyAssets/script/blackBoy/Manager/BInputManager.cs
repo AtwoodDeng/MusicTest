@@ -18,7 +18,7 @@ public class BInputManager : MonoBehaviour {
 
 		if ( Input.GetKeyDown( KeyCode.Escape ))
 		{
-			Application.Quit();
+			BEventManager.Instance.PostEvent(EventDefine.OnFrontMenu , new MessageEventArgs() );
 		}
 	}
 

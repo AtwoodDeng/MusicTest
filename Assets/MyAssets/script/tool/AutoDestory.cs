@@ -9,6 +9,8 @@ public class AutoDestory : MonoBehaviour {
 	public bool isDestroyOnAwake = true;
 	public bool isFadeOut = false;
 	public bool isStopParticle = false;
+	public bool isBecomeSmall = false;
+	public Vector3 smallFactor = Vector3.zero;
 
 	// Use this for initialization
 	void Awake () {
@@ -33,6 +35,22 @@ public class AutoDestory : MonoBehaviour {
 					           "color",
 					           toColor);
 				}
+
+				if ( GetComponentsInChildren<tk2dSprite>() != null )
+				{
+					tk2dSprite[] spirtes =  GetComponentsInChildren<tk2dSprite>();
+
+					foreach( tk2dSprite spirte in spirtes )
+					{
+						
+						UnityEngine.Color toColor = spirte.color;
+						toColor.a = 0;
+						HOTween.To( spirte,
+						           destroyTime - 0.05f,
+						           "color",
+						           toColor);
+					}
+				}
 			}
 			if ( isStopParticle )
 			{
@@ -47,6 +65,18 @@ public class AutoDestory : MonoBehaviour {
 						ps.enableEmission = false;
 					}
 				}
+			}
+			if ( isBecomeSmall )
+			{
+				HOTween.To( this.transform
+				           , destroyTime
+				           , "localScale"
+				           , smallFactor
+				           , false
+				           , EaseType.Linear
+				           , 0
+				           );
+
 			}
 
 		}

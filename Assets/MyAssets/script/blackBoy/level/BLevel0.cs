@@ -116,12 +116,11 @@ public class BLevel0 : BLevel {
 //				
 //				showTipsByKey( "OUT" );
 //			}
-			HeroBody body = BObjManager.Instance.BHeroBody;
-			body.transform.position = startPoints[1].transform.position;
-			Vector3 velocity = body.rigidbody.velocity;
-			velocity.x = 0;
-			velocity.y = 0;
-			body.rigidbody.velocity = velocity;
+			Restart( "" );
+		}
+		if ( "on_end_point".Equals( msg ))
+		{
+			BEventManager.Instance.PostEvent( EventDefine.OnFrontMenu , new MessageEventArgs() );
 		}
 //		if ( "get_mind".Equals( msg ) )
 //		{	
@@ -138,5 +137,16 @@ public class BLevel0 : BLevel {
 //				showTips( tips , Global.TipsShowTime , Global.TipsDisappearTime );
 //			}
 //		}
+	}
+
+	public override void Restart (string msg)
+	{
+		HeroBody body = BObjManager.Instance.BHeroBody;
+		body.transform.position = startPoints[1].transform.position;
+		Vector3 velocity = body.rigidbody.velocity;
+		velocity.x = 0;
+		velocity.y = 0;
+		body.rigidbody.velocity = velocity;
+		body.Restart();
 	}
 }
