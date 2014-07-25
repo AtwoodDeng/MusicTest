@@ -3,7 +3,7 @@ using System.Collections;
 
 public class BFollowWith : MonoBehaviour {
 
-	GameObject target = null;
+	public GameObject target = null;
 
 	public enum FollowState{
 		Relatively,   // put at the target's 
