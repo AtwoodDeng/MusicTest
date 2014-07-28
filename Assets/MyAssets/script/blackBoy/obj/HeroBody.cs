@@ -13,7 +13,13 @@ public class HeroBody : MonoBehaviour {
 
 	public HandGroup leftHandGroup;
 	public HandGroup rightHandGroup; 
-	public float throwI = 1.0f;
+	private float throwI{
+		get{
+			return pThrowI * fHealth;
+		}
+
+	}
+	public float pThrowI = 5f;
 	public MeshCollider meshCollider;
 	[HideInInspector]public ParticleSystem catchEffect;
 
@@ -24,6 +30,17 @@ public class HeroBody : MonoBehaviour {
 	public float freezenDragMutiply = 200f;
 	private float dragOrignal = 0f;
 	private float angularDragOrignal = 0f;
+
+	public float fHealth
+	{
+		get {
+			//return 1f / ( 0.5f + 1f / health );
+			return Mathf.Pow( health , 2f );
+		}
+	}
+	public float health = 1.0f;
+	public float harmRate = 0.05f;
+	public float recoverRate = 1.002f;
 
 	public HeroHand.ForceType tempForceType = HeroHand.ForceType.SpinCW;
 
@@ -424,6 +441,9 @@ public class HeroBody : MonoBehaviour {
 		if ( meshCollider )
 			meshCollider.convex =true;
 
+		//recover
+		Recover();
+		GUIDebug.add( ShowType.label , "Health " + health );
 		//adjust
 //		Vector3 pos = transform.position;
 //		pos.z = Global.BHeroPosition.z;
@@ -482,4 +502,18 @@ public class HeroBody : MonoBehaviour {
 		tempAngleVelocity = tempVelocity = Vector3.zero;
 	}
 
+	
+	public void Harm( Vector3 relativeVelocity )
+	{
+		health *= 1 / ( 1 + Mathf.Pow( relativeVelocity.sqrMagnitude , 3f ) * harmRate );
+	}
+	public void Recover ()
+	{
+		if ( health < Global.MAX_HEALTH )
+		{
+			if ( health < Global.MIN_HEALTH )
+				health = Global.MIN_HEALTH;
+			health *= recoverRate;
+		}
+	}
 }

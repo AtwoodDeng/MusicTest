@@ -46,7 +46,19 @@ public class HeroHand : MonoBehaviour {
 	}
 	private GameObject stayAdhereObj;
 	public GameObject stayAdhereEffect;
-	public float MaxLength = 100f;
+
+	private float MaxLength
+	{
+		get{
+			float health = 1f;
+			if ( heroBody != null )
+				health = heroBody.fHealth;
+			return pMaxLength * health;
+		}
+	}
+
+	public float pMaxLength = 8f;
+
 
 	[HideInInspector]public GameObject catchEffectPrefab;
 	public float catchEffectTime = 1.0f;
@@ -138,7 +150,7 @@ public class HeroHand : MonoBehaviour {
 
 	public void Throw( Vector3 force )
 	{
-		//Debug.Log("throw " + state + " force " + force);
+		Debug.Log("throw " + state + " force " + force);
 		if ( state == HandState.Free )
 		{
 			state = HandState.Fly;
@@ -574,4 +586,5 @@ public class HeroHand : MonoBehaviour {
 	{
 		return transform.position;
 	}
+
 }

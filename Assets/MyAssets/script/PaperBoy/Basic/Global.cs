@@ -101,8 +101,13 @@ public static class Global {
 
 	public static Dictionary<string,string> LevelScriptDictionary
 	= new Dictionary<string, string> {
+		{"CrowLevel3" , "text/script/CrowLevel3"},
+		{"CrowLevel2" , "text/script/CrowLevel2"},
+		{"CrowLevel1" , "text/script/CrowLevel1"},
+		{"CrowLevel0" , "text/script/CrowLevel0"},
 		{"Level1" , "text/script/level1"},
-		{"Level0" , "text/script/level0"}};
+		{"Level0" , "text/script/level0"}
+	};
 
 	public static int LevelScriptKeyIndex = 0;
 
@@ -117,6 +122,8 @@ public static class Global {
 	public static float LargeDrag = 99999f;
 	public static float LargeAngleDrag = 99999f;
 
+	public static float MAX_HEALTH = 1.0f;
+	public static float MIN_HEALTH = 0.03f;
 
 
 }
