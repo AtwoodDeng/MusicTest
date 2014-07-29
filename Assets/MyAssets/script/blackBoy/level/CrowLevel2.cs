@@ -11,7 +11,7 @@ public class CrowLevel2 : BLevel {
 	public State state = State.Init;
 	
 	//===== start point =====
-	public GameObject startPoint;
+//	public GameObject startPoint;
 	public int maxHalo;
 	
 	//records
@@ -37,14 +37,15 @@ public class CrowLevel2 : BLevel {
 	
 	public override void DealTrigger (string msg)
 	{
+		base.DealTrigger(msg);
 		if ( "out_of_range".Equals( msg ) )
 		{
 			Restart( "" );
 		}
-		if ( "on_end_point".Equals( msg ))
-		{
-			BEventManager.Instance.PostEvent( EventDefine.OnFrontMenu , new MessageEventArgs() );
-		}
+//		if ( "on_end_point".Equals( msg ))
+//		{
+//			BEventManager.Instance.PostEvent( EventDefine.OnFrontMenu , new MessageEventArgs() );
+//		}
 	}
 	
 	public override void Restart (string msg)

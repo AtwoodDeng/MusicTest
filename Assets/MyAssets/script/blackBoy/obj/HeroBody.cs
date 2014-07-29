@@ -35,7 +35,7 @@ public class HeroBody : MonoBehaviour {
 	{
 		get {
 			//return 1f / ( 0.5f + 1f / health );
-			return Mathf.Pow( health , 1.25f );
+			return Mathf.Pow( health , 1.33f );
 		}
 	}
 	public float health = 1.0f;
@@ -43,6 +43,8 @@ public class HeroBody : MonoBehaviour {
 	public float recoverRate = 1.002f;
 
 	public HeroHand.ForceType tempForceType = HeroHand.ForceType.SpinCW;
+
+	public GameObject ScreenCloud;
 
 	public class HandGroup{
 		int num;
@@ -162,6 +164,13 @@ public class HeroBody : MonoBehaviour {
 			dragOrignal = rigidbody.drag;
 			angularDragOrignal = rigidbody.angularDrag;
 		}
+		//creat screen Cloud
+		{
+			GameObject scPre = Resources.Load( Global.ScreenCloudPath ) as GameObject;
+			ScreenCloud = Instantiate( scPre ) as GameObject;
+			ScreenCloud.transform.parent = BObjManager.Instance.Effect.transform;
+		}
+
 	}
 
 
@@ -174,6 +183,7 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnUnfreezen, OnUnfreezen);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnStop, OnStop);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnBack, OnBack);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnTriggerable, OnTriggerable);
 //		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
 
 	}
@@ -187,6 +197,7 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnUnfreezen, OnUnfreezen);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnStop, OnStop);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnBack, OnBack);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnTriggerable, OnTriggerable);
 //		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
 	}
 //
@@ -233,8 +244,19 @@ public class HeroBody : MonoBehaviour {
 //
 //
 //	}
+
+	public void OnTriggerable(EventDefine eventName, object sender, EventArgs args)
+	{
+		MessageEventArgs msg = (MessageEventArgs) args;
+		if ( Global.PeanutMessage.Equals( msg.GetMessage(Global.TriggableMessage)) )
+		{
+			Heal();
+		}
+	}
+
 	private Vector3 tempVelocity;
 	private Vector3 tempAngleVelocity;
+
 	public void OnStop(EventDefine eventName, object sender, EventArgs args)
 	{
 		tempVelocity = rigidbody.velocity;
@@ -450,12 +472,26 @@ public class HeroBody : MonoBehaviour {
 		//recover
 		Recover();
 		GUIDebug.add( ShowType.label , "Health " + health );
+
+		//screen cloud 
+		UpdateScreenCloud();
 		//adjust
 //		Vector3 pos = transform.position;
 //		pos.z = Global.BHeroPosition.z;
 //		transform.position  = pos ;
 	}
 
+
+	void UpdateScreenCloud()
+	{
+		tk2dSprite[] sprites = ScreenCloud.GetComponentsInChildren<tk2dSprite>();
+		for( int i = 0 ; i < sprites.Length ; ++i )
+		{
+			Color col = sprites[i].color;
+			col.a = ( 1f - Mathf.Pow( health , 0.33f ) );
+			sprites[i].color = col;
+		}
+	}
 	public Vector3 getArmPos()
 	{
 		return transform.position;
@@ -530,6 +566,22 @@ public class HeroBody : MonoBehaviour {
 		}else
 		{
 			health = Mathf.Min( health * recoverRate , Global.MAX_HEALTH );
+		}
+	}
+	public void Heal ()
+	{
+		if ( health <= Global.HURT_HEALTH3 )
+		{
+			health = Global.HURT_HEALTH3 * recoverRate;
+		}else if ( health <= Global.HURT_HEALTH2 )
+		{
+			health = Global.HURT_HEALTH2 * recoverRate;
+		}else if ( health <= Global.HURT_HEALTH1 )
+		{
+			health = Global.HURT_HEALTH1 * recoverRate;
+		}else
+		{
+			health = Global.MAX_HEALTH;
 		}
 	}
 }

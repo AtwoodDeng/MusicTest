@@ -33,7 +33,7 @@ public class FrontMenu : MonoBehaviour {
 
 	public void OnNextLevel()
 	{
-		ChangeSence ( Global.nextLevelDict[levelName] );
+//		ChangeSence ( Global.nextLevelDict[levelName] );
 
 	}
 

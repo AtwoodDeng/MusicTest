@@ -10,6 +10,7 @@ public class Triggerable : MonoBehaviour {
 	public string message="";
 	public bool isSendMessage = false;
 	public bool isDestroyOnEnter = false ;
+	public bool isRefill = false;
 	public bool isSmallOnDestory = false;
 	public bool isBarrier = false;
 	public bool isCenterBarrier = false;
@@ -95,7 +96,15 @@ public class Triggerable : MonoBehaviour {
 					
 					isSendMessage = false;
 					isBarrier = false;
+
+					if ( isRefill )
+					{
+						SendMessageUpwards("RefillObj" , SendMessageOptions.DontRequireReceiver );
+						isRefill = false;
+					}
 				}
+
+
 			}
 		}
 	}

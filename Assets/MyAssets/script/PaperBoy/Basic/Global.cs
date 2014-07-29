@@ -38,6 +38,12 @@ public static class Global {
 	public static string MouseMid = "MOUSE_MID";
 	public static int MouseMidInt = 2;
 
+
+	public static string TriggableMessage = "msg";
+	public static string PeanutMessage = "get_peanut";
+	public static string EndPointMessage = "on_end_point";
+
+
 	public static string[] CollidableTag = {"ROCK","OUTER"};
 
 	public static Dictionary<string,string> HandCatchEffectDict
@@ -74,8 +80,13 @@ public static class Global {
 	
 	public static Dictionary<string,string> nextLevelDict
 	= new Dictionary<string, string> {
+		{"CrowLevel0", "CrowLevel1"},
+		{"CrowLevel1" , "CrowLevel2"},
+		{"CrowLevel2" , "CrowLevel3"},
 		{"level0" , "KafakaLv0_2"}};
-	
+
+	public static string ScreenCloudPath = "Tool/Prefab/ScreenCloud";
+
 	public static string FrontMenuPath = "Tool/Prefab/FrontMenuShow";
 	public static string FrontMenuName = "FrontMenuMainBody";
 	public static string FrontMenuTag = "FRONTMENU";
@@ -85,7 +96,6 @@ public static class Global {
 
 	private static int _ID = 0 ;
 	public static int getID(){
-		Debug.Log("Global ID" + _ID.ToString());
 		return _ID++;
 	}
 
@@ -98,6 +108,10 @@ public static class Global {
 	public static float TextDisappearTime = 1f;
 	public static float TipsShowTime = 2.2f;
 	public static float TipsDisappearTime = 0.1f;
+
+	
+	public static string BeginPointEffect = "Effect/level/BeginLevel";
+	public static string EndPointEffect = "Effect/level/EndLevel";
 
 	public static Dictionary<string,string> LevelScriptDictionary
 	= new Dictionary<string, string> {
@@ -130,6 +144,8 @@ public static class Global {
 	public static float HURT_HEALTH2 = 0.45f;
 	public static float HURT_HEALTH3 = 0.45f;
 	public static float MIN_HEALTH = 0.03f;
+
+	public static float EndLevelTime = 3f;
 
 
 

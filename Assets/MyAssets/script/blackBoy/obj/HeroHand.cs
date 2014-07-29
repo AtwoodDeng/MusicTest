@@ -50,7 +50,7 @@ public class HeroHand : MonoBehaviour {
 	private float MaxLength
 	{
 		get{
-			return pMaxLength * fHealth ;
+			return pMaxLength * Mathf.Pow ( fHealth , 1.5f ) ;
 		}
 	}
 

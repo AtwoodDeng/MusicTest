@@ -12,7 +12,7 @@ public class CrowLevel1 : BLevel {
 	public State state = State.Init;
 	
 	//===== start point =====
-	public GameObject startPoint;
+//	public GameObject startPoint;
 	public int maxHalo;
 	
 	//records
@@ -108,6 +108,7 @@ public class CrowLevel1 : BLevel {
 	
 	public override void DealTrigger (string msg)
 	{
+		base.DealTrigger( msg );
 		if ( "out_of_range".Equals( msg ) )
 		{
 			//			if ( ! isOutOfRange )
@@ -118,10 +119,10 @@ public class CrowLevel1 : BLevel {
 			//			}
 			Restart( "" );
 		}
-		if ( "on_end_point".Equals( msg ))
-		{
-			BEventManager.Instance.PostEvent( EventDefine.OnFrontMenu , new MessageEventArgs() );
-		}
+//		if ( "on_end_point".Equals( msg ))
+//		{
+//			BEventManager.Instance.PostEvent( EventDefine.OnFrontMenu , new MessageEventArgs() );
+//		}
 		//		if ( "get_mind".Equals( msg ) )
 		//		{	
 		//			halo_count++;
@@ -139,14 +140,14 @@ public class CrowLevel1 : BLevel {
 		//		}
 	}
 	
-	public override void Restart (string msg)
-	{
-		HeroBody body = BObjManager.Instance.BHeroBody;
-		body.transform.position = startPoint.transform.position;
-		Vector3 velocity = body.rigidbody.velocity;
-		velocity.x = 0;
-		velocity.y = 0;
-		body.rigidbody.velocity = velocity;
-		body.Restart();
-	}
+//	public override void Restart (string msg)
+//	{
+//		HeroBody body = BObjManager.Instance.BHeroBody;
+//		body.transform.position = startPoint.transform.position;
+//		Vector3 velocity = body.rigidbody.velocity;
+//		velocity.x = 0;
+//		velocity.y = 0;
+//		body.rigidbody.velocity = velocity;
+//		body.Restart();
+//	}
 }

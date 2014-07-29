@@ -5,6 +5,13 @@ using System.Collections.Generic;
 
 public class BLevel : MonoBehaviour {
 	public string levelName;
+	public GameObject startPoint;
+	void Awake()
+	{
+		GameObject beginPre = Resources.Load( Global.BeginPointEffect ) as GameObject;
+		GameObject begin = Instantiate( beginPre ) as GameObject;
+		begin.transform.parent = BObjManager.Instance.Effect.transform;
+	}
 
 	virtual public void showNextDialogGroup()
 	{
@@ -74,18 +81,25 @@ public class BLevel : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnRestart ,OnRestart );
 	}
 
+
+
 	public void OnTriggerable(EventDefine eventName, object sender, EventArgs args)
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
-		DealTrigger( msg.GetMessage("msg"));
+		DealTrigger( msg.GetMessage(Global.TriggableMessage));
 	}
 
 	virtual public void DealTrigger( string msg )
 	{
+		if ( Global.EndPointMessage.Equals( msg ))
+		{
+			OnEnd(Global.EndLevelTime);
+		}
 	}
 
 	virtual public void DealWith( float deltaTime )
 	{
+
 	}
 
 	public void OnRestart(EventDefine eventName, object sender, EventArgs args)
@@ -96,6 +110,30 @@ public class BLevel : MonoBehaviour {
 
 	virtual public void Restart( string msg )
 	{
+		if ( startPoint != null )
+		{
+			HeroBody body = BObjManager.Instance.BHeroBody;
+			body.transform.position = startPoint.transform.position;
+			Vector3 velocity = body.rigidbody.velocity;
+			velocity.x = 0;
+			velocity.y = 0;
+			body.rigidbody.velocity = velocity;
+			body.Restart();
+		}
+	}
+
+	public void OnEnd( float endTime )
+	{
+		GameObject endPre = Resources.Load( Global.EndPointEffect ) as GameObject;
+		GameObject end = Instantiate( endPre ) as GameObject;
+		end.transform.parent = BObjManager.Instance.Effect.transform;
+
+		Invoke( "OnEndFinal" , endTime );
+	}
+
+	public void OnEndFinal()
+	{
+		Application.LoadLevel( Global.nextLevelDict[levelName] );
 	}
 
 	void Update()
