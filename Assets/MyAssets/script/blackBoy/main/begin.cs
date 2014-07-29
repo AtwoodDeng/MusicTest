@@ -16,6 +16,7 @@ public class begin : MonoBehaviour {
 	{
 		if ( follow == null )
 			follow = GetComponent<FollowCamera>();
+		Screen.showCursor = true;
 	}
 
 	void HoverLevel0()
@@ -56,12 +57,23 @@ public class begin : MonoBehaviour {
 			follow.target = buttons[level];
 	}
 
-	void OnLevel1()
+	void OnLeve3()
 	{
 		if ( enableSwitchScene )
 		{
 			switchPS.enableEmission = true;
-			nextSenceName = "KafakaLV1";
+			nextSenceName = "CrowLevel3";
+			enableSwitchScene = false;
+			Invoke( "gotoNextSence" ,delay );
+		}
+	}
+
+	void OnLevel2()
+	{
+		if ( enableSwitchScene )
+		{
+			switchPS.enableEmission = true;
+			nextSenceName = "CrowLevel2";
 			enableSwitchScene = false;
 			Invoke( "gotoNextSence" ,delay );
 		}
@@ -72,7 +84,7 @@ public class begin : MonoBehaviour {
 		if ( enableSwitchScene )
 		{
 			switchPS.enableEmission = true;
-			nextSenceName = "KafakaLV0";
+			nextSenceName = "CrowLevel0";
 			enableSwitchScene = false;
 			Invoke( "gotoNextSence" ,delay );
 		}

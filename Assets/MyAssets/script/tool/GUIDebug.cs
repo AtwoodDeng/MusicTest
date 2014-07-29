@@ -34,8 +34,8 @@ public class GUIDebug : MonoBehaviour {
 		hasNew = false;
 		for( int i = 0 ; i < types.Count ; ++i )
 		{
-			if ( ShowType.label == types[i] )
-				GUILayout.Label( contents[i] );
+//			if ( ShowType.label == types[i] )
+//				GUILayout.Label( contents[i] );
 
 		}
 

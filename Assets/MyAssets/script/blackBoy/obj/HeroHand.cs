@@ -47,6 +47,7 @@ public class HeroHand : MonoBehaviour {
 	private GameObject stayAdhereObj;
 	public GameObject stayAdhereEffect;
 
+	public float minFlyTime = 0.2f;
 	private float MaxLength
 	{
 		get{
@@ -574,9 +575,13 @@ public class HeroHand : MonoBehaviour {
 		if ( state == HandState.Fly )
 		{
 			Debug.Log("trigger enter " + collider.gameObject.name + " " + collider.gameObject.tag );
-			if ( Global.HandStayTag.Equals( collider.gameObject.tag ))
+			if ( ( System.DateTime.Now - throwTime ).TotalSeconds > minFlyTime )
 			{
-				Catch( collider.gameObject );
+			
+				if ( Global.HandStayTag.Equals( collider.gameObject.tag ))
+				{
+					Catch( collider.gameObject );
+				}
 			}
 
 		}else if ( state == HandState.Shrink )

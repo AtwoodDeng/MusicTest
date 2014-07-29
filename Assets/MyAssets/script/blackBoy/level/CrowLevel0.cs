@@ -12,7 +12,7 @@ public class CrowLevel0 : BLevel {
 	public State state = State.Init;
 
 	//===== start point =====
-	public GameObject[] startPoint;
+//	public GameObject[] startPoint;
 	public int maxHalo;
 
 	//records
@@ -139,14 +139,14 @@ public class CrowLevel0 : BLevel {
 //		}
 	}
 
-	public override void Restart (string msg)
-	{
-		HeroBody body = BObjManager.Instance.BHeroBody;
-		body.transform.position = startPoint[1].transform.position;
-		Vector3 velocity = body.rigidbody.velocity;
-		velocity.x = 0;
-		velocity.y = 0;
-		body.rigidbody.velocity = velocity;
-		body.Restart();
-	}
+//	public override void Restart (string msg)
+//	{
+//		HeroBody body = BObjManager.Instance.BHeroBody;
+//		body.transform.position = startPoint[1].transform.position;
+//		Vector3 velocity = body.rigidbody.velocity;
+//		velocity.x = 0;
+//		velocity.y = 0;
+//		body.rigidbody.velocity = velocity;
+//		body.Restart();
+//	}
 }

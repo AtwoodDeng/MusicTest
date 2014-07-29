@@ -488,7 +488,7 @@ public class HeroBody : MonoBehaviour {
 		for( int i = 0 ; i < sprites.Length ; ++i )
 		{
 			Color col = sprites[i].color;
-			col.a = ( 1f - Mathf.Pow( health , 0.33f ) );
+			col.a = ( 1f - Mathf.Pow( health , 0.9f ) );
 			sprites[i].color = col;
 		}
 	}

@@ -55,15 +55,15 @@ public class Pullable : BlackWhiteRock {
 			force *= -1f;
 			break;
 		}
-		float forceIntense = Vector3.Dot (force , pullToward.normalized );
+		float forceIntenseTest = Vector3.Dot (force , pullToward.normalized );
 		
-		GUIDebug.add(ShowType.label , "[DealPull]forceIntense " + forceIntense.ToString() );
+//		GUIDebug.add(ShowType.label , "[DealPull]forceIntenseTest " + forceIntenseTest.ToString() );
 
 		//set test time
-		if ( testForce( forceIntense ) )
+		if ( testForce( forceIntenseTest ) )
 		{
 			nowTestTime += deltaTime;
-			nowTestEnergy += deltaTime * forceIntense;
+			nowTestEnergy += deltaTime * forceIntenseTest;
 		}else{
 			nowTestTime = 0f;
 			nowTestEnergy = 0f;

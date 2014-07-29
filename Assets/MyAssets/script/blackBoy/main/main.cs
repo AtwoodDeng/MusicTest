@@ -11,6 +11,7 @@ public class main : MonoBehaviour {
 	void Awake()
 	{
 		enableSwitchScene = true;
+		Screen.showCursor = true;
 	}
 
 	void OnBegin()
@@ -39,6 +40,14 @@ public class main : MonoBehaviour {
 	void gotoNextSence()
 	{
 		Application.LoadLevel( nextSenceName );
+	}
+
+	void Update()
+	{
+		if ( Input.GetKeyDown( KeyCode.Escape ))
+		{
+			Application.Quit();
+		}
 	}
 }
 

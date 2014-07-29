@@ -83,6 +83,7 @@ public static class Global {
 		{"CrowLevel0", "CrowLevel1"},
 		{"CrowLevel1" , "CrowLevel2"},
 		{"CrowLevel2" , "CrowLevel3"},
+		{"CrowLevel3" , "CrowLevel0"},
 		{"level0" , "KafakaLv0_2"}};
 
 	public static string ScreenCloudPath = "Tool/Prefab/ScreenCloud";
