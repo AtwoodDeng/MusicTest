@@ -109,6 +109,9 @@ public static class Global {
 		{"Level0" , "text/script/level0"}
 	};
 
+	public static float MIN_HAND_FORCE_LENGTH = 0.25f;
+	public static float MAX_HAND_FORCE = 0.01f;
+
 	public static int LevelScriptKeyIndex = 0;
 
 	public static float ShowDialogTimeBlock = 3f;
@@ -123,7 +126,12 @@ public static class Global {
 	public static float LargeAngleDrag = 99999f;
 
 	public static float MAX_HEALTH = 1.0f;
+	public static float HURT_HEALTH1 = 0.45f;
+	public static float HURT_HEALTH2 = 0.45f;
+	public static float HURT_HEALTH3 = 0.45f;
 	public static float MIN_HEALTH = 0.03f;
+
+
 
 
 }

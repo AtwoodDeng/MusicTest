@@ -14,6 +14,7 @@ public class Hitable : MonoBehaviour {
 
 	public float RelativeVelocityRate = 10f;
 	public float SizeRate = 0.1f;
+	public float HitScaleDiff = 0.1f;
 
 	public float splitTime = 0.05f;
 	private float timmer = 0f;
@@ -46,6 +47,7 @@ public class Hitable : MonoBehaviour {
 			float angle = Mathf.Atan( toward.y / toward.x ) /Mathf.PI * 180f;
 
 			e.transform.parent = BObjManager.Instance.Effect.transform;
+			e.transform.localScale *= ( 1 + HitScaleDiff * velocity.sqrMagnitude );
 			e.transform.position = hitPoint.point;
 			//e.transform.eulerAngles += new Vector3( angle , 0 , 0 );
 
@@ -56,6 +58,7 @@ public class Hitable : MonoBehaviour {
 			{
 				ps.startSize *= ( 1 + Mathf.Pow( velocity.sqrMagnitude , 2f ) * SizeRate );
 				ps.emissionRate = velocity.sqrMagnitude * RelativeVelocityRate ;
+				ps.startLifetime *= ( 1 + Mathf.Pow( velocity.sqrMagnitude , 2f ) * SizeRate );
 
 			}
 

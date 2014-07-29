@@ -3,7 +3,7 @@ using System.Collections;
 using System;
 using Holoville.HOTween;
 
-public class Pullable : Catchable {
+public class Pullable : BlackWhiteRock {
 
 	public enum PullType
 	{

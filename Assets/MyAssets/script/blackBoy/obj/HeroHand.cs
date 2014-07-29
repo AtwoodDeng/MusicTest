@@ -50,10 +50,7 @@ public class HeroHand : MonoBehaviour {
 	private float MaxLength
 	{
 		get{
-			float health = 1f;
-			if ( heroBody != null )
-				health = heroBody.fHealth;
-			return pMaxLength * health;
+			return pMaxLength * fHealth ;
 		}
 	}
 
@@ -82,6 +79,15 @@ public class HeroHand : MonoBehaviour {
 	public DateTime throwTime = System.DateTime.Now;
 	public double ShrinkTime = 1.0;
 	public float ShrinkClose = 0.98f;
+
+	private float fHealth{
+		get{
+			if ( heroBody != null )
+				return heroBody.fHealth;
+			return 1f;
+		}
+	}
+
 
 	// Use this for initialization
 	void Start () {
@@ -281,10 +287,14 @@ public class HeroHand : MonoBehaviour {
 			if ( forceType == ForceType.Pull )
 				return getForceMain();
 			else
-				return getForceMain() + getForceSecond();
+			{
+				return ( getForceMain() + getForceSecond()) * Mathf.Pow( fHealth , 0.5f );
+			}
 		}
 		return Vector3.zero;
 	}
+
+	
 
 	public Vector3 getForceMain()
 	{
@@ -299,12 +309,22 @@ public class HeroHand : MonoBehaviour {
 				return forceIntense * ( - toBody );
 			else if ( forceType == ForceType.SpinAntiCW )
 			{
+				float handLength = transform.localPosition.sqrMagnitude;
+				
+				if ( handLength < Global.MIN_HAND_FORCE_LENGTH )
+					return Vector3.zero;
+
 				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
 				//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude);
 				//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude);
 				return force;
 			}else if ( forceType == ForceType.SpinCW )
 			{
+				float handLength = transform.localPosition.sqrMagnitude;
+				
+				if ( handLength < Global.MIN_HAND_FORCE_LENGTH )
+					return Vector3.zero;
+
 				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
 				//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude );
 				//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude );

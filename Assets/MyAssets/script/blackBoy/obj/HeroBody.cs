@@ -35,7 +35,7 @@ public class HeroBody : MonoBehaviour {
 	{
 		get {
 			//return 1f / ( 0.5f + 1f / health );
-			return Mathf.Pow( health , 2f );
+			return Mathf.Pow( health , 1.25f );
 		}
 	}
 	public float health = 1.0f;
@@ -125,6 +125,7 @@ public class HeroBody : MonoBehaviour {
 			{
 				force += hands[i].getForce();
 			}
+
 			return force;
 		}
 
@@ -429,13 +430,18 @@ public class HeroBody : MonoBehaviour {
 
 	public Vector3 getForce()
 	{
-		return leftHandGroup.getForce() + rightHandGroup.getForce();
+		Vector3 force = leftHandGroup.getForce() + rightHandGroup.getForce();
+		GUIDebug.add( ShowType.label , "Hand's force " + force + force.sqrMagnitude );
+		if ( force.sqrMagnitude > Global.MAX_HAND_FORCE )
+			force = force.normalized * Global.MAX_HAND_FORCE;
+		return force;
 	}
 
 
 	// Update is called once per frame
 	void Update () {
 		///force 
+
 		rigidbody.AddForce( getForce() , ForceMode.Impulse );
 
 		if ( meshCollider )
@@ -509,11 +515,21 @@ public class HeroBody : MonoBehaviour {
 	}
 	public void Recover ()
 	{
-		if ( health < Global.MAX_HEALTH )
+		
+		if ( health < Global.MIN_HEALTH )
+			health = Global.MIN_HEALTH;
+		if ( health <= Global.HURT_HEALTH3 )
 		{
-			if ( health < Global.MIN_HEALTH )
-				health = Global.MIN_HEALTH;
-			health *= recoverRate;
+			health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH3 );
+		}else if ( health <= Global.HURT_HEALTH2 )
+		{
+			health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH2 );
+		}else if ( health <= Global.HURT_HEALTH1 )
+		{
+			health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH1 );
+		}else
+		{
+			health = Mathf.Min( health * recoverRate , Global.MAX_HEALTH );
 		}
 	}
 }
