@@ -7,12 +7,25 @@ using System;
 [RequireComponent(typeof(Collider))]
 public class HeroBody : MonoBehaviour {
 
+
+
 	public GameObject HeroHandPrefab;
 	public GameObject HeroArmPrefab;
 
+	//force
+	public enum ForceType
+	{
+		ByHand,
+		ToMouse
+	};
+	public ForceType forceType;
+	public float ForceBlockTime = 1f;
+	public float forceIntense = 50.0f;
 
 	public HandGroup leftHandGroup;
-	public HandGroup rightHandGroup; 
+	public HandGroup rightHandGroup;
+
+	//throw hands
 	private float throwI{
 		get{
 			return pThrowI * fHealth;
@@ -23,14 +36,17 @@ public class HeroBody : MonoBehaviour {
 	public MeshCollider meshCollider;
 	[HideInInspector]public ParticleSystem catchEffect;
 
+	//advoid touch wall force
 	public float advoidIntense = 1.0f;
 	public float MAXAdvoidForce = 5.0f;
 
+	//freezen
 	public float MAXFreezenSpeed = 0.05f;
 	public float freezenDragMutiply = 200f;
 	private float dragOrignal = 0f;
 	private float angularDragOrignal = 0f;
 
+	//heal
 	public float fHealth
 	{
 		get {
@@ -41,6 +57,8 @@ public class HeroBody : MonoBehaviour {
 	public float health = 1.0f;
 	public float harmRate = 0.05f;
 	public float recoverRate = 1.002f;
+
+
 
 	public HeroHand.ForceType tempForceType = HeroHand.ForceType.SpinCW;
 
@@ -55,6 +73,7 @@ public class HeroBody : MonoBehaviour {
 			None,
 			Free,
 			Fly,
+			Shrink,
 			Catch
 		}
 		public HandGroupState state
@@ -68,7 +87,9 @@ public class HeroBody : MonoBehaviour {
 				
 				if ( HandsStateAllEqual( HeroHand.HandState.None ))
 					return HandGroupState.None;
-				
+				if ( HandsStateAllEqual( HeroHand.HandState.Shrink ))
+					return HandGroupState.Shrink;
+
 				return HandGroupState.Fly; 
 				
 			}
@@ -127,6 +148,7 @@ public class HeroBody : MonoBehaviour {
 			{
 				force += hands[i].getForce();
 			}
+
 
 			return force;
 		}
@@ -320,13 +342,19 @@ public class HeroBody : MonoBehaviour {
 		//strench left and shrink right if left is free
 		//else strench right and shrink left
 
+
 		bool isLeft =  (leftHandGroup.state == HandGroup.HandGroupState.Free);
 			
 		leftHandGroup.setForceType( tempForceType );
 		rightHandGroup.setForceType( tempForceType );
 
-		StrenchHandToward( posX , posY , isLeft );
-		ShrinkHand( !isLeft );
+		//cannot strentch if a hand group is flying
+		if ( leftHandGroup.state != HandGroup.HandGroupState.Fly 
+		    && rightHandGroup.state != HandGroup.HandGroupState.Fly )
+		{
+			StrenchHandToward( posX , posY , isLeft );
+			ShrinkHand( !isLeft );
+		}
 
 
 //		bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
@@ -379,6 +407,10 @@ public class HeroBody : MonoBehaviour {
 		{
 			bool isLeft = bool.Parse(msg.GetMessage("isLeft"));
 			ShrinkHand( isLeft );
+		}else if (msg.ContainMessage("both"))
+		{
+			ShrinkHand(true);
+			ShrinkHand(false);
 		}else if ( msg.ContainMessage("HandID"))
 		{
 			int handID = Convert.ToInt32( msg.GetMessage("HandID"));
@@ -407,10 +439,10 @@ public class HeroBody : MonoBehaviour {
 
 		if ( isLeft )
 		{
-			leftHandGroup.Throw( transform.position , forceToward , throwI ); 
+				leftHandGroup.Throw( transform.position , forceToward , throwI ); 
 		}else
 		{
-			rightHandGroup.Throw( transform.position, forceToward , throwI );
+				rightHandGroup.Throw( transform.position, forceToward , throwI );
 		}
 	}
 
@@ -456,7 +488,11 @@ public class HeroBody : MonoBehaviour {
 		GUIDebug.add( ShowType.label , "Hand's force " + force + force.sqrMagnitude );
 		if ( force.sqrMagnitude > Global.MAX_HAND_FORCE )
 			force = force.normalized * Global.MAX_HAND_FORCE;
+		//restrict to force 
+		if ( force != Vector3.zero )
+			force = force * forceIntense - Physics.gravity * rigidbody.mass * Time.deltaTime * Global.FORCE_NORMAL; 
 		return force;
+
 	}
 
 
@@ -464,7 +500,10 @@ public class HeroBody : MonoBehaviour {
 	void Update () {
 		///force 
 
-		rigidbody.AddForce( getForce() , ForceMode.Impulse );
+		if ( ifForce (Time.deltaTime) )
+		{
+			rigidbody.AddForce( getForce() , ForceMode.Impulse );
+		}
 
 		if ( meshCollider )
 			meshCollider.convex =true;
@@ -479,6 +518,20 @@ public class HeroBody : MonoBehaviour {
 //		Vector3 pos = transform.position;
 //		pos.z = Global.BHeroPosition.z;
 //		transform.position  = pos ;
+	}
+
+	private float forceTimer = 0f;
+	bool ifForce( float deltaTime , bool ifUpdate = true , bool ifChange = true )
+	{
+		if ( ifUpdate )
+			forceTimer += deltaTime;
+		if ( forceTimer > ForceBlockTime )
+		{
+			if ( ifChange )
+				forceTimer = 0;
+			return true;
+		}
+		return false;
 	}
 
 

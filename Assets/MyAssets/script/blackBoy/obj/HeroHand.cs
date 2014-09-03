@@ -19,11 +19,23 @@ public class HeroHand : MonoBehaviour {
 	public HeroBody heroBody;
 	public HeroArm heroArm;
 	public float forceIntense = 0.025f;
-	public float minLength = 0.001f;
-	public float toBodyForceRate = 0.33f;
+	public float minForceLength = 0.001f;
+	public float maxForceLength = 7f;
+	public float forceIntenseN = 0.33f;
+	public enum SecondForceType
+	{
+		Always,
+		N,
+		Spring,
+		SpringAndN,
+
+	}
+	public SecondForceType secondForceType;
+	public float toBodyForceRate = 0.6f;
 	public float MinChangeForceTypeTime = 2f;
 	private float ForceTypeTime = 0f;
-	public float MinChangeDistance = 0.1f;
+
+	//public float MinChangeDistance = 0.1f;
 	public GameObject stayObj
 	{
 		get {
@@ -60,6 +72,8 @@ public class HeroHand : MonoBehaviour {
 
 	[HideInInspector]public GameObject catchEffectPrefab;
 	public float catchEffectTime = 1.0f;
+
+	public float maxVelocity = 1f;
 
 	public enum HandState{
 		None,
@@ -109,7 +123,7 @@ public class HeroHand : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		GUIDebug.add(ShowType.label , state.ToString() );
+//		GUIDebug.add(ShowType.label , state.ToString() );
 		if ( state == HandState.Fly )
 		{
 			DateTime now = System.DateTime.Now;
@@ -235,7 +249,7 @@ public class HeroHand : MonoBehaviour {
 			rigidbody.velocity = Vector3.zero;
 			state = HandState.Catch;
 
-			SetForceType( forceType );
+			SetForceType( stayObjCatchable.getForceType() );
 			CreateCatchEffect( stayPos );
 
 
@@ -285,12 +299,17 @@ public class HeroHand : MonoBehaviour {
 
 		if ( state == HandState.Catch )
 		{
-			if ( forceType == ForceType.Pull )
-				return getForceMain();
-			else
-			{
-				return ( getForceMain() + getForceSecond()) * Mathf.Pow( fHealth , 0.5f );
-			}
+//			if ( forceType == ForceType.Pull )
+//				return getForceMain();
+//			else
+//			{
+//				return ( getForceMain() + getForceSecond()) * Mathf.Pow( fHealth , 0.5f );
+//
+//			}
+//			GUIDebug.add(ShowType.label , "forec M " + (getForceMain()*1000f) + getForceMain().sqrMagnitude + " S " + (getForceSecond()*1000f) + getForceSecond().sqrMagnitude );
+//			GUIDebug.add (ShowType.label , "VN " + (getVN()*100f) +getVN().sqrMagnitude + " VT " + (getVT() * 100f ) + getVT().sqrMagnitude);
+//			GUIDebug.add( ShowType.label , "velocity " + ( heroBody.rigidbody.velocity*100f ));
+			return ( getForceMain() + getForceSecond()) * Mathf.Pow( fHealth , 0.5f ) ;
 		}
 		return Vector3.zero;
 	}
@@ -301,65 +320,155 @@ public class HeroHand : MonoBehaviour {
 	{
 		Vector3 toBody = heroBody.transform.position - transform.position;
 
-		if ( stayObjCatchable != null )
+		if ( heroBody.forceType == HeroBody.ForceType.ByHand )
 		{
-			return stayObjCatchable.getForceMain( toBody );
-		}else
-		{
-			if ( forceType == ForceType.Pull )
-				return forceIntense * ( - toBody );
-			else if ( forceType == ForceType.SpinAntiCW )
+			if ( stayObjCatchable != null )
 			{
-				float handLength = transform.localPosition.sqrMagnitude;
-				
-				if ( handLength < Global.MIN_HAND_FORCE_LENGTH )
-					return Vector3.zero;
+				float length = transform.localPosition.sqrMagnitude;
+				Vector3 force = Vector3.zero;
+				if ( length > minForceLength )
+					force = stayObjCatchable.getForceMain( toBody );
 
-				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
-				//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude);
-				//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude);
-				return force;
-			}else if ( forceType == ForceType.SpinCW )
+				//adjust by VT
+				float vt = getVT().sqrMagnitude;
+				if ( vt > maxVelocity )
+					vt = maxVelocity;
+				return forceIntense * force * ( maxVelocity - vt );
+			}else
 			{
-				float handLength = transform.localPosition.sqrMagnitude;
-				
-				if ( handLength < Global.MIN_HAND_FORCE_LENGTH )
-					return Vector3.zero;
-
-				Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
-				//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude );
-				//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude );
-				return force;
+//				if ( forceType == ForceType.Pull )
+//					return forceIntense * ( - toBody );
+//				else if ( forceType == ForceType.SpinAntiCW )
+//				{
+//					float handLength = transform.localPosition.sqrMagnitude;
+//					
+//					if ( handLength < Global.MIN_HAND_FORCE_LENGTH )
+//						return Vector3.zero;
+//
+//					Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / transform.localPosition.magnitude;
+//					//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude);
+//					//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude);
+//					return force;
+//				}else if ( forceType == ForceType.SpinCW )
+//				{
+//					float handLength = transform.localPosition.sqrMagnitude;
+//					
+//					if ( handLength < Global.MIN_HAND_FORCE_LENGTH )
+//						return Vector3.zero;
+//
+//					Vector3 force = forceIntense * Vector3.Cross( toBody.normalized , Vector3.forward ) / transform.localPosition.magnitude;
+//					//				GUIDebug.add( ShowType.label , "ForceT" + force + " " + force.sqrMagnitude );
+//					//				GUIDebug.add( ShowType.label , "ForceN" + forceIntense * toBodyForceRate * toBody + " " + (forceIntense * toBodyForceRate * toBody).sqrMagnitude );
+//					return force;
+//				}
 			}
 		}
-
-
-//		else 
-//		{
-//			Vector3 mousePos = BInputManager.Instance.MousePosition;
-//			Vector3 toward = mousePos - heroBody.transform.position;
-//
-//			float length = transform.localPosition.magnitude;
-//			if ( length < minLength )
-//				length = minLength;
-//			if ( length > MaxLength )
-//				length = Global.MAX_FLOAT15;
-//			length = Mathf.Exp( ( MaxLength - length ) / MaxLength ) * Global.MAX_FLOAT15;
-//
-//			Vector3 force = toward.normalized * forceIntense / minLength;
-//
-//
-//			GUIDebug.add( ShowType.label , "heroHand " + length * 1000f + " " + length * 1000f );
-//
+		else if ( heroBody.forceType == HeroBody.ForceType.ToMouse )
+		{
+//			Vector3 force = BInputManager.Instance.MousePosition - heroBody.transform.position;
+//			force = force.normalized * heroBody.forceIntense;
 //			return force;
-//		}
+		}
 
+		return Vector3.zero;
+	}
+
+	public float adjustNRate = 0.1f;
+	public Vector3 getForceSecond()
+	{
+		if ( state == HandState.Catch )
+		{
+			if ( secondForceType == SecondForceType.Always )
+			{
+				float direct = -1f;
+				if ( stayObjCatchable != null )
+				{
+					switch( stayObjCatchable.forceType)
+					{
+					case Catchable.ForceType.In :
+						direct = -1f;
+						break;
+					case Catchable.ForceType.Out:
+						direct = 1f;
+						break;
+					}
+				}
+				Vector3 toBody = heroBody.transform.position - transform.position;
+				return direct * forceIntense * toBodyForceRate * toBody ;
+			}else if ( secondForceType == SecondForceType.N )
+			{
+				//force N
+				Vector3 toBody = heroBody.transform.position - transform.position;
+				Vector3 VT = getVT();
+				Vector3 VN = getVN();
+				Vector3 force =  - VT.magnitude / toBody.sqrMagnitude 
+					* heroBody.rigidbody.mass
+						* toBody.normalized
+						* Time.deltaTime 
+						* Global.FORCE_NORMAL
+						* forceIntenseN;
+				
+				return force;
+			}else if ( secondForceType == SecondForceType.Spring )
+			{
+				Vector3 toBody = heroBody.transform.position - transform.position;
+				float length = toBody.sqrMagnitude;
+				if ( minForceLength > length )
+				{
+					//force out 
+					return forceIntense * toBodyForceRate * toBody.normalized * ( minForceLength - length );
+				}else if ( maxForceLength < length )
+				{
+					//force in
+					return - forceIntense * toBodyForceRate * toBody.normalized * ( length - maxForceLength );	
+				}
+			}else if ( secondForceType == SecondForceType.SpringAndN )
+			{
+				Vector3 force = Vector3.zero;
+				Vector3 toBody = heroBody.transform.position - transform.position;
+				float length = toBody.sqrMagnitude;
+				Vector3 VN = getVN();
+				if ( minForceLength > length )
+				{
+					//force out 
+					force +=  forceIntense * toBodyForceRate * toBody.normalized * ( minForceLength - length );
+					return force;
+				}else if ( maxForceLength < length )
+				{
+					//force in
+					if ( Vector3.Dot( VN , toBody ) > 0 )
+						force += - forceIntense * toBodyForceRate * toBody.normalized * Mathf.Pow ( ( length - maxForceLength ) , 3f ) * VN.sqrMagnitude;
+				
+				}
+//				if ( minForceLength > length )
+//				{
+//					if ( Vector3.Dot( VN , toBody ) < 0 )
+//						force += VN.sqrMagnitude * adjustNRate * heroBody.rigidbody.mass * Global.FORCE_NORMAL * toBody.normalized;
+//
+//				}else if ( maxForceLength < length )
+//				{
+//					if ( Vector3.Dot( VN , toBody ) > 0 )
+//						force += - VN.sqrMagnitude * adjustNRate * heroBody.rigidbody.mass * Global.FORCE_NORMAL * toBody.normalized;
+//				}
+				
+				//force N
+				Vector3 VT = getVT();
+				force += - VT.magnitude / toBody.sqrMagnitude 
+					* heroBody.rigidbody.mass
+						* toBody.normalized
+						* Time.deltaTime 
+						* Global.FORCE_NORMAL
+						* forceIntenseN;
+				return force;
+			}
+			
+		}
 		return Vector3.zero;
 	}
 
 	public void UpdateForceType( bool ifUpdate = true , bool ifForceChange = false)
 	{
-		GUIDebug.add( ShowType.label , "forceType " + forceType.ToString() );
+//		GUIDebug.add( ShowType.label , "forceType " + forceType.ToString() );
 
 //		if ( state == HandState.Catch )
 //		{
@@ -514,44 +623,7 @@ public class HeroHand : MonoBehaviour {
 		forceType = toForceType;
 	}
 
-	public Vector3 getForceSecond()
-	{
-		if ( state == HandState.Catch )
-		{
-			float direct = -1f;
-			if ( stayObjCatchable != null )
-			{
-				switch( stayObjCatchable.forceType)
-				{
-				case Catchable.ForceType.In :
-					direct = -1f;
-					break;
-				case Catchable.ForceType.Out:
-					direct = 1f;
-					break;
-				}
-			}
-			Vector3 toBody = heroBody.transform.position - transform.position;
-			return direct * forceIntense * toBodyForceRate * toBody ;
 
-
-//			///get force v
-//			Vector3 radius = heroBody.transform.position - stayObj.transform.position;
-//			Vector3 velocity = heroBody.rigidbody.velocity;
-//			Vector3 velocityN = radius.normalized * Vector3.Dot( radius.normalized , velocity );
-//			Vector3 VelocityT = velocity - velocityN;
-//
-//			
-//			Vector3 forceV = - radius.normalized * VelocityT.magnitude / radius.sqrMagnitude * rigidbody.mass * Global.A2FRate ;
-//
-//			
-//			GUIDebug.add( ShowType.label , " force v r=" + radius + " v=" + velocity + "force v " );
-//
-//			return forceV;
-
-		}
-		return Vector3.zero;
-	}
 
 	public Vector3 getForceN()
 	{
@@ -611,5 +683,26 @@ public class HeroHand : MonoBehaviour {
 	{
 		return transform.position;
 	}
+	public Vector3 getVN()
+	{
+		if ( heroBody != null )
+		{
+			Vector3 v = heroBody.rigidbody.velocity;
+			Vector3 toBody = heroBody.transform.position - transform.position;
+			Vector3 VN = Vector3.Dot( v , toBody.normalized ) * toBody.normalized;
+			return VN;
+		}
+		return Vector3.zero;
+	}
+	public Vector3 getVT()
+	{
+		if ( heroBody != null )
+		{
+			Vector3 VT = heroBody.rigidbody.velocity - getVN();
+			return VT;
+		}
+		return Vector3.zero;
+	}
+
 
 }

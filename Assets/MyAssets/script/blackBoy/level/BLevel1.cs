@@ -106,7 +106,7 @@ public class BLevel1 : BLevel {
 	void Update()
 	{
 		DealWith(Time.deltaTime);
-		GUIDebug.add( ShowType.label , state.ToString());
+		GUIDebug.add( ShowType.label , "BLevel1 state : " + state.ToString());
 	}
 
 	public override void DealWith(float deltaTime)

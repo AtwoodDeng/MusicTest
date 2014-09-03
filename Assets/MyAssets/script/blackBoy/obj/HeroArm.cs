@@ -10,6 +10,8 @@ public class HeroArm : MonoBehaviour {
 	public LineRenderer lineRenderer;
 	public GameObject catchEffectBody;
 
+	public bool enableCatchEffect = false;
+
 	// Update is called once per frame
 	void Update () {
 
@@ -26,12 +28,18 @@ public class HeroArm : MonoBehaviour {
 			bodyToHand.z = 0 ;
 			Vector3 direction = Vector3.Cross( Vector3.back , bodyToHand );
 
-//			GUIDebug.add(ShowType.label , "bth:" + bodyToHand.ToString() +  " direction:" + direction.ToString());
-			float angle =  Vector3.Angle( new Vector3( 1f , 0, 0 ) , direction );
-//			GUIDebug.add(ShowType.label , "Angle " + angle );
-			if ( direction.y < 0 )
-				angle = -angle;
-			catchEffectBody.transform.rotation = Quaternion.Euler( 0 , 0 , angle );
+			direction = - body.getForce();
+
+			if ( direction.magnitude > 0.001f )
+			{
+
+	//			GUIDebug.add(ShowType.label , "bth:" + bodyToHand.ToString() +  " direction:" + direction.ToString());
+				float angle =  Vector3.Angle( new Vector3( 1f , 0, 0 ) , direction );
+	//			GUIDebug.add(ShowType.label , "Angle " + angle );
+				if ( direction.y < 0 )
+					angle = -angle;
+				catchEffectBody.transform.rotation = Quaternion.Euler( 0 , 0 , angle );
+			}
 
 		}
 	}
@@ -102,6 +110,7 @@ public class HeroArm : MonoBehaviour {
 			DestoryCatchEffectBody();
 		}
 
+		//Catch Effect
 		GameObject catchEffectPrefab = Resources.Load( Global.ArmCatchEffectDict [ type.ToString() ] ) as GameObject;
 		if ( catchEffectPrefab == null )
 		{
@@ -125,6 +134,7 @@ public class HeroArm : MonoBehaviour {
 		AutoDestory destroy = catchEffectBody.GetComponent<AutoDestory>();
 		if (destroy != null )
 			destroy.isDestroyOnAwake = false;
+		catchEffectBody.SetActive( enableCatchEffect );
 
 		Update();
 		
@@ -139,6 +149,12 @@ public class HeroArm : MonoBehaviour {
 		{
 			emitter.emit = false;
 		}
+		ParticleSystem[] particles = catchEffectBody.GetComponentsInChildren<ParticleSystem>();
+		foreach( ParticleSystem particle in particles )
+		{
+			particle.enableEmission = false;
+		}
+
 		AutoDestory destroy = catchEffectBody.GetComponent<AutoDestory>();
 		if (destroy != null )
 			destroy.StartAutoDestory();

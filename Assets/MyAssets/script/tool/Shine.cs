@@ -27,6 +27,14 @@ public class Shine : MonoBehaviour {
 	public bool isEnter = false;
 	public float enterSizeRate = 10f;
 
+	public EaseType scaleEaseType = EaseType.EaseInOutQuart;
+	public EaseType angleEaseType = EaseType.EaseInOutQuart;
+	public EaseType posEaseType = EaseType.EaseInOutQuart;
+
+	public LoopType scaleLoopType = LoopType.Yoyo;
+	public LoopType angleLoopType = LoopType.Yoyo;
+	public LoopType posLoopType = LoopType.Yoyo;
+
 	// Use this for initialization
 	void Awake () {
 		oriScale = transform.localScale;
@@ -70,8 +78,8 @@ public class Shine : MonoBehaviour {
 			           , new TweenParms()
 			           .Prop("localScale" 
 			      		, oriScale * maxScale)
-			           .Ease(EaseType.EaseInOutQuart)
-			           .Loops( 999 , LoopType.Yoyo )
+			           .Ease(scaleEaseType)
+			           .Loops( 999 , scaleLoopType )
 			           .Delay( ScaleDelay )
 			           );
 		
@@ -81,8 +89,8 @@ public class Shine : MonoBehaviour {
 			           .Prop("eulerAngles" 
 			      		, new Vector3( 0 , 0 , MaxAngle )
 			      		, true)
-			           .Ease(EaseType.EaseInOutQuart)
-			           .Loops( 999 , LoopType.Yoyo )
+			           .Ease(angleEaseType)
+			           .Loops( 999 , angleLoopType )
 			           .Delay( AngleDelay ) );
 
 			HOTween.To( transform 
@@ -91,8 +99,8 @@ public class Shine : MonoBehaviour {
 			           .Prop("position" 
 			     	 	, MaxPos 
 			      		, true )
-			           .Ease(EaseType.EaseInOutQuart)
-			           .Loops( 999 , LoopType.Yoyo )
+			           .Ease(posEaseType)
+			           .Loops( 999 , posLoopType )
 			           .Delay( PosDelay )
 			           );
 			

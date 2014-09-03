@@ -6,7 +6,8 @@ public class Catchable : MonoBehaviour {
 
 	private int ID = -1;
 	protected string HandID;
-	public float forceIntense = 0.03f;
+	public float forceIntense = 1f;
+	public bool isAttract = false;
 
 	public enum ForceType
 	{
@@ -61,9 +62,15 @@ public class Catchable : MonoBehaviour {
 
 	virtual public Vector3 getForceMain( Vector3 toBody )
 	{
-		return forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ) / toBody.magnitude;
+
+		return forceIntense * Vector3.Cross( toBody.normalized , Vector3.back ); // / toBody.magnitude;
 	}
 
 	virtual public void  DealCatch(MessageEventArgs msg){}
 	virtual public void  DealShrink(MessageEventArgs msg){}
+
+	virtual public HeroHand.ForceType getForceType()
+	{
+		return HeroHand.ForceType.None;
+	}
 }

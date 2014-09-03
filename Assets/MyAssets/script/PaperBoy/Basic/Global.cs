@@ -28,6 +28,7 @@ public static class Global {
 	public static string HandStayTag = "ROCK" ;
 
 	public static string HeroTag = "HERO";
+	public static string HeroHandTag = "HERO_HAND";
 
 	public static string MouseLeft = "MOUSE_LEFT";
 	public static int MouseLeftInt = 0;
@@ -48,8 +49,8 @@ public static class Global {
 
 	public static Dictionary<string,string> HandCatchEffectDict
 		= new Dictionary<string, string> {
-		{"SpinCW" , "Effect/Hero/DotSmall"},
-		{"SpinAntiCW" , "Effect/Hero/DotSmall"},
+		{"SpinCW" , "Effect/Hero/DropSmallCW"},
+		{"SpinAntiCW" , "Effect/Hero/DropSmallAntiCW"},
 		{"Pull" , "Effect/Hero/DotSmall"},
 		{"None", ""}};
 	public static Dictionary<string,string> HandStayObjCatchEffect
@@ -62,8 +63,8 @@ public static class Global {
 		{"None", "Effect/Hero/DotSmall"}};
 	public static Dictionary<string,string> ArmCatchEffectDict
 	= new Dictionary<string, string> {
-		{"SpinCW" , "Effect/Hero/FeatherCW"},
-		{"SpinAntiCW" , "Effect/Hero/FeatherAntiCW"},
+		{"SpinCW" , "Effect/Hero/FeatherStable"},
+		{"SpinAntiCW" , "Effect/Hero/FeatherStable"},
 		{"Pull" , "Effect/Hero/FeatherCW"},
 		{"None", ""}};
 	public static Dictionary<string,string> CursorDict
@@ -83,7 +84,8 @@ public static class Global {
 		{"CrowLevel0", "CrowLevel1"},
 		{"CrowLevel1" , "CrowLevel2"},
 		{"CrowLevel2" , "CrowLevel3"},
-		{"CrowLevel3" , "CrowLevel0"},
+		{"CrowLevel3" , "CrowLevel4"},
+		{"CrowLevel4" , "CrowLevel0"},
 		{"level0" , "KafakaLv0_2"}};
 
 	public static string ScreenCloudPath = "Tool/Prefab/ScreenCloud";
@@ -116,6 +118,7 @@ public static class Global {
 
 	public static Dictionary<string,string> LevelScriptDictionary
 	= new Dictionary<string, string> {
+		{"CrowLevel4" , "text/script/CrowLevel4"},
 		{"CrowLevel3" , "text/script/CrowLevel3"},
 		{"CrowLevel2" , "text/script/CrowLevel2"},
 		{"CrowLevel1" , "text/script/CrowLevel1"},
@@ -125,7 +128,7 @@ public static class Global {
 	};
 
 	public static float MIN_HAND_FORCE_LENGTH = 0.25f;
-	public static float MAX_HAND_FORCE = 0.01f;
+	public static float MAX_HAND_FORCE = 0.03f;
 
 	public static int LevelScriptKeyIndex = 0;
 
@@ -149,6 +152,6 @@ public static class Global {
 	public static float EndLevelTime = 3f;
 
 
-
+	public static float FORCE_NORMAL = 1f;
 
 }

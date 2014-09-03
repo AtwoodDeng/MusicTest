@@ -10,6 +10,7 @@ public class FollowCamera : MonoBehaviour {
 	public bool onlyY = false;
 	// Use this for initialization
 	void Start () {
+		target = BObjManager.Instance.BHeroBody.gameObject;
 	}
 	
 	// Update is called once per frame

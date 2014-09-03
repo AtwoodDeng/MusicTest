@@ -50,7 +50,7 @@ public class PMouseManager : MonoBehaviour {
 		pos = dir / dir.z * staticZ;
 		tempPos = pos;
 
-		GUIDebug.add (ShowType.label, "temp pos : " + pos);
+//		GUIDebug.add (ShowType.label, "temp pos : " + pos);
 
 		if ( mouse )
 		{

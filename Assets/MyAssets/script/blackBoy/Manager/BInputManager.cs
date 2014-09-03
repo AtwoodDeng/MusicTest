@@ -112,7 +112,7 @@ public class BInputManager : MonoBehaviour {
 //		pos = dir / dir.z * Global.BstaticPosition.z;
 		if ( mainCamera == null )
 			mainCamera = Camera.main;
-		GUIDebug.add(ShowType.label , Screen.width + " " + Screen.height );
+//		GUIDebug.add(ShowType.label , Screen.width + " " + Screen.height );
 
 		mousePos = Input.mousePosition;
 		mousePos.x -= Screen.width / 2;
@@ -121,12 +121,12 @@ public class BInputManager : MonoBehaviour {
 		mousePos.y *= mainCamera.orthographicSize / ( Screen.height / 2 ) ;
 		mousePos += mainCamera.transform.position;
 		mousePos.z = Global.BstaticPosition.z;
-		GUIDebug.add(ShowType.label , mousePos.ToString());
+//		GUIDebug.add(ShowType.label , mousePos.ToString());
 
 
 //		pos = Input.mousePosition;
-		GUIDebug.add( ShowType.label , Input.mousePosition.ToString() );
-		GUIDebug.add( ShowType.label , mousePos.ToString());
+//		GUIDebug.add( ShowType.label , Input.mousePosition.ToString() );
+//		GUIDebug.add( ShowType.label , mousePos.ToString());
 		
 		state = MouseState.Free;
 		
@@ -177,7 +177,7 @@ public class BInputManager : MonoBehaviour {
 		else if (Input.GetMouseButtonUp(Global.MouseRightInt))
 		{
 		}
-		GUIDebug.add (ShowType.label, "MouseState " + state);
+//		GUIDebug.add (ShowType.label, "MouseState " + state);
 	}
 
 	

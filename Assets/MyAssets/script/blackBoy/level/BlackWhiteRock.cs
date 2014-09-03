@@ -37,4 +37,24 @@ public class BlackWhiteRock : Catchable {
 		}
 		return Vector3.zero;
 	}
+
+	public override HeroHand.ForceType getForceType ()
+	{
+		switch ( spinType )
+		{
+		case SpinType.AntiClockwise:
+			return HeroHand.ForceType.SpinAntiCW;
+			break;
+		case SpinType.Black:
+			return HeroHand.ForceType.SpinAntiCW;
+			break;
+		case SpinType.Clockwise:
+			return HeroHand.ForceType.SpinCW;
+			break;
+		case SpinType.White:
+			return HeroHand.ForceType.SpinCW;
+			break;
+		}
+		return base.getForceType();
+	}
 }
