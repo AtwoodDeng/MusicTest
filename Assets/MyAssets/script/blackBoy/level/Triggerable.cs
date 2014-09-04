@@ -15,6 +15,7 @@ public class Triggerable : MonoBehaviour {
 	public bool isBarrier = false;
 	public bool isCenterBarrier = false;
 	public bool isSlowBarrier = false;
+	public bool isShrinkOnEnter = false;
 
 	public GameObject DestoryEffect;
 	public float destoryTime = 10f;
@@ -104,7 +105,12 @@ public class Triggerable : MonoBehaviour {
 					}
 				}
 
-
+				if ( isShrinkOnEnter )
+				{
+					MessageEventArgs shrinkHandMessage = new MessageEventArgs();
+					shrinkHandMessage.AddMessage("both" , "1" );
+					BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , shrinkHandMessage );
+				}
 			}
 		}
 	}
