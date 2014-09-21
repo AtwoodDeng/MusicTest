@@ -36,4 +36,11 @@ public enum EventDefine{
 	OnFrontMenuBack,
 	OnFrontMenu,
 
+	OnHurt,
+	OnDead,
+
+	OnBackClick,
+	OnAfterCatch,
+	OnHisCatch,
+
 }

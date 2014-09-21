@@ -149,9 +149,33 @@ public static class Global {
 	public static float HURT_HEALTH3 = 0.45f;
 	public static float MIN_HEALTH = 0.03f;
 
+	public static float MIN_SCREEN_VIEW = 0.4f;
+
 	public static float EndLevelTime = 3f;
-
-
+	
 	public static float FORCE_NORMAL = 1f;
+
+	public static string RECOVER_POINT_TAG = "RECOVER_POINT";
+	public static string RECOVER_MSG = "RecoverPoint";
+
+	public static float DEAD_START_TIME = 0.33f;
+	
+	public static string DeadTurnBlackEffect = "Effect/level/DeadTurnBlack";
+	public static string DeadAppearEffect = "Effect/level/DeadAppear";
+
+	public static string V32Str( Vector3 v3)
+	{
+		return v3.x + "$" + v3.y + "$" + v3.z;
+	}
+	public static Vector3 Str2V3( string str)
+	{
+		string[] v3s = str.Split('$');
+		return new Vector3( float.Parse(v3s[0]) , float.Parse(v3s[1]) , float.Parse(v3s[2]));
+	}
+
+	public static float BACK_FLOW_DESTORY_TIME = 1f;
+
+	public static string OPP_HISTORY_DIR = "crow.app/Contents/Resources/His";
+	public static string OPP_HISTORY_SUFFIX = ".his";
 
 }

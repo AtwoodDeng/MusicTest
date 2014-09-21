@@ -262,6 +262,7 @@ public class HeroHand : MonoBehaviour {
 				Debug.Log("HeroHand addID " + _stayObj.GetComponent<Catchable>().getID ().ToString() );
 				Vector3 pos = transform.position;
 				msg.AddMessage( "CatchPosition" , pos.x + " " + pos.y + " " + pos.z );
+				msg.AddMessage( "CatchPositionGlobal" , Global.V32Str( pos ) );
 			}
 			BEventManager.Instance.PostEvent( EventDefine.OnCatch , msg );
 		}

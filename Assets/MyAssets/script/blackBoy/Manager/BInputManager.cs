@@ -45,6 +45,11 @@ public class BInputManager : MonoBehaviour {
 		}
 	}
 	private Vector3 mousePos;
+	public Vector3 mousePosGlobal{
+		get{
+			return cursor.transform.position;
+		}
+	}
 	DateTime mouseStartTime;
 	public float pointSenseTime = 0.2f;
 
@@ -121,6 +126,9 @@ public class BInputManager : MonoBehaviour {
 		mousePos.y *= mainCamera.orthographicSize / ( Screen.height / 2 ) ;
 		mousePos += mainCamera.transform.position;
 		mousePos.z = Global.BstaticPosition.z;
+
+
+
 //		GUIDebug.add(ShowType.label , mousePos.ToString());
 
 
@@ -137,6 +145,7 @@ public class BInputManager : MonoBehaviour {
 			msg.AddMessage("posX" , mousePos.x.ToString() );
 			msg.AddMessage("posY" , mousePos.y.ToString() );
 			msg.AddMessage("type" , Global.MouseLeft );
+			msg.AddMessage("globalPos" , Global.V32Str( mousePosGlobal) );
 			BEventManager.Instance.PostEvent(EventDefine.OnMouseClick , msg );
 		}
 		else if (Input.GetMouseButton(Global.MouseLeftInt))
@@ -160,6 +169,7 @@ public class BInputManager : MonoBehaviour {
 			MessageEventArgs msg = new MessageEventArgs();
 			msg.AddMessage("posX" , mousePos.x.ToString() );
 			msg.AddMessage("posY" , mousePos.y.ToString() );
+			msg.AddMessage("globalPos" , Global.V32Str( mousePosGlobal) );
 			msg.AddMessage("type" , Global.MouseRight );
 			BEventManager.Instance.PostEvent(EventDefine.OnMouseClick , msg );
 		}

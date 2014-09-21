@@ -8,7 +8,7 @@ public class BDataManager : MonoBehaviour {
 	public static BDataManager Instance { get { return s_Instance; } }
 	private static BDataManager s_Instance;
 
-	public string language = "ENGLISH";
+	public string language = "CHINESE";
 
 	private LevelScript tempLevelScript = new LevelScript();
 

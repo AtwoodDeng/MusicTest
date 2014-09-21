@@ -47,17 +47,29 @@ public class HeroBody : MonoBehaviour {
 	private float angularDragOrignal = 0f;
 
 	//heal
+	
+	public enum HealthType
+	{
+		Dead,
+		NotDead,
+	};
+	public HealthType healthType = HealthType.NotDead;
 	public float fHealth
 	{
 		get {
 			//return 1f / ( 0.5f + 1f / health );
-			return Mathf.Pow( health , 1.33f );
+			if ( healthType == HealthType.NotDead )
+				return Mathf.Pow( health , 1.33f );
+			else if ( healthType == HealthType.Dead )
+				return 0.33f + 0.66f * health;
+			return health;
 		}
 	}
 	public float health = 1.0f;
 	public float harmRate = 0.05f;
 	public float recoverRate = 1.002f;
-
+	private bool isDead = false;
+	public float deadDragIncrease = 30f;
 
 
 	public HeroHand.ForceType tempForceType = HeroHand.ForceType.SpinCW;
@@ -325,6 +337,8 @@ public class HeroBody : MonoBehaviour {
 		
 	public void OnMoveHand(EventDefine eventName, object sender, EventArgs args)
 	{
+		if ( healthType == HealthType.Dead && isDead )
+			return;
 		// Debug.Log("on move hand");
 		MessageEventArgs msg = (MessageEventArgs)args;
 		float posX = transform.localPosition.x;
@@ -541,7 +555,7 @@ public class HeroBody : MonoBehaviour {
 		for( int i = 0 ; i < sprites.Length ; ++i )
 		{
 			Color col = sprites[i].color;
-			col.a = ( 1f - Mathf.Pow( health , 0.9f ) );
+			col.a = ( 1f - Mathf.Pow( health , 0.9f ) ) * ( 1 - Global.MIN_SCREEN_VIEW ) ;
 			sprites[i].color = col;
 		}
 	}
@@ -600,41 +614,66 @@ public class HeroBody : MonoBehaviour {
 	
 	public void Harm( Vector3 relativeVelocity )
 	{
-		health *= 1 / ( 1 + Mathf.Pow( relativeVelocity.sqrMagnitude , 3f ) * harmRate );
+		if ( healthType == HealthType.NotDead )
+			health *= 1 / ( 1 + Mathf.Pow( relativeVelocity.sqrMagnitude , 3f ) * harmRate );
+		else if ( healthType == HealthType.Dead )
+			health *= 1 / ( 1 + Mathf.Pow( relativeVelocity.sqrMagnitude , 1f ) * harmRate );
 	}
 	public void Recover ()
 	{
-		
-		if ( health < Global.MIN_HEALTH )
-			health = Global.MIN_HEALTH;
-		if ( health <= Global.HURT_HEALTH3 )
+
+		if ( healthType == HealthType.NotDead )
 		{
-			health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH3 );
-		}else if ( health <= Global.HURT_HEALTH2 )
+			if ( health < Global.MIN_HEALTH )
+				health = Global.MIN_HEALTH;
+			if ( health <= Global.HURT_HEALTH3 )
+			{
+				health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH3 );
+			}else if ( health <= Global.HURT_HEALTH2 )
+			{
+				health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH2 );
+			}else if ( health <= Global.HURT_HEALTH1 )
+			{
+				health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH1 );
+			}else
+			{
+				health = Mathf.Min( health * recoverRate , Global.MAX_HEALTH );
+			}
+		}else if ( healthType == HealthType.Dead && !isDead )
 		{
-			health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH2 );
-		}else if ( health <= Global.HURT_HEALTH1 )
-		{
-			health = Mathf.Min( health * recoverRate , Global.HURT_HEALTH1 );
-		}else
-		{
-			health = Mathf.Min( health * recoverRate , Global.MAX_HEALTH );
+			if ( health < Global.MIN_HEALTH )
+			{
+				BEventManager.Instance.PostEvent( EventDefine.OnDead );
+				isDead = true;
+				rigidbody.drag *= deadDragIncrease;
+				rigidbody.angularDrag *= deadDragIncrease;
+			}
 		}
 	}
 	public void Heal ()
 	{
-		if ( health <= Global.HURT_HEALTH3 )
+		if ( healthType == HealthType.NotDead )
 		{
-			health = Global.HURT_HEALTH3 * recoverRate;
-		}else if ( health <= Global.HURT_HEALTH2 )
+			if ( health <= Global.HURT_HEALTH3 )
+			{
+				health = Global.HURT_HEALTH3 * recoverRate;
+			}else if ( health <= Global.HURT_HEALTH2 )
+			{
+				health = Global.HURT_HEALTH2 * recoverRate;
+			}else if ( health <= Global.HURT_HEALTH1 )
+			{
+				health = Global.HURT_HEALTH1 * recoverRate;
+			}else
+			{
+				health = Global.MAX_HEALTH;
+			}
+		}else if ( healthType == HealthType.Dead )
 		{
-			health = Global.HURT_HEALTH2 * recoverRate;
-		}else if ( health <= Global.HURT_HEALTH1 )
-		{
-			health = Global.HURT_HEALTH1 * recoverRate;
-		}else
-		{
+			transform.eulerAngles = new Vector3(0,0,0);
 			health = Global.MAX_HEALTH;
+			isDead = false;
+			rigidbody.drag /= deadDragIncrease;
+			rigidbody.angularDrag /=deadDragIncrease;
 		}
 	}
 }

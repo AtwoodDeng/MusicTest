@@ -176,6 +176,7 @@ public class BLogicManager : MonoBehaviour {
 			{
 				msg.AddMessage("isLeft", Boolean.TrueString );
 				BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
+				BEventManager.Instance.PostEvent( EventDefine.OnBackClick , args );
 			}
 			
 			if ( Global.MouseRight.Equals( msg.GetMessage("type")))

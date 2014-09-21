@@ -6,6 +6,10 @@ using System.Collections.Generic;
 public class BLevel : MonoBehaviour {
 	public string levelName;
 	public GameObject startPoint;
+	public GameObject RecoverPoint;
+
+	public float time = 0;
+
 	void Awake()
 	{
 		GameObject beginPre = Resources.Load( Global.BeginPointEffect ) as GameObject;
@@ -73,12 +77,14 @@ public class BLevel : MonoBehaviour {
 	protected void OnEnable() {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnTriggerable ,OnTriggerable );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnRestart ,OnRestart );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnDead ,OnDead );
 		
 	}
 
 	protected void OnDisable() {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnTriggerable, OnTriggerable);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnRestart ,OnRestart );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnDead ,OnDead );
 	}
 
 
@@ -95,17 +101,31 @@ public class BLevel : MonoBehaviour {
 		{
 			OnEnd(Global.EndLevelTime);
 		}
+		if ( Global.RECOVER_MSG.Equals( msg.Substring(0, Global.RECOVER_MSG.Length )) )
+		{
+			if ( RecoverPoint == null || RecoverPoint.name != msg )
+			{
+				foreach( GameObject rp in BObjManager.Instance.RecoverPoints )
+				{
+					if ( rp.name == msg )
+					{
+						RecoverPoint = rp;
+					}
+				}
+			}
+		}
 	}
 
 	virtual public void DealWith( float deltaTime )
 	{
-
+		time += deltaTime;
 	}
 
 	public void OnRestart(EventDefine eventName, object sender, EventArgs args)
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
 		Restart( msg.GetMessage("msg"));
+		time = 0;
 	}
 
 	virtual public void Restart( string msg )
@@ -139,5 +159,48 @@ public class BLevel : MonoBehaviour {
 	void Update()
 	{
 		DealWith( Time.deltaTime );
+	}
+
+	public void OnDead(EventDefine eventName, object sender, EventArgs args )
+	{
+		//effect
+		GameObject deadTurnBlackPre = Resources.Load( Global.DeadTurnBlackEffect ) as GameObject;
+		GameObject deadTurnBlack = Instantiate( deadTurnBlackPre ) as GameObject;
+		deadTurnBlack.transform.parent = BObjManager.Instance.Effect.transform;
+
+		//invoke reset position
+		SpriteColorChange[] scChanges = deadTurnBlack.GetComponentsInChildren<SpriteColorChange>();
+		float maxFadeTime = 0f;
+		foreach( SpriteColorChange scc in scChanges )
+		{
+			if ( maxFadeTime < scc.fadeTime + scc.delay )
+				maxFadeTime = scc.fadeTime + scc.delay;
+		}
+
+		Invoke( "OnDeadResetPosition" , maxFadeTime );
+
+		//shrink
+		MessageEventArgs msg = new MessageEventArgs();
+		msg.AddMessage( "both" , "1" );
+		BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg );
+	}
+	
+	public void OnDeadResetPosition()
+	{
+		//effect
+		GameObject deadAppearPre = Resources.Load( Global.DeadAppearEffect ) as GameObject;
+		GameObject deadAppear = Instantiate( deadAppearPre ) as GameObject;
+		deadAppear.transform.parent = BObjManager.Instance.Effect.transform;
+
+		//reset position
+		if ( RecoverPoint != null )
+		{
+			BObjManager.Instance.BHeroBody.transform.position = RecoverPoint.transform.position;
+			BObjManager.Instance.BHeroBody.Heal();
+		}else
+		{
+			BObjManager.Instance.BHeroBody.transform.position = startPoint.transform.position;
+			BObjManager.Instance.BHeroBody.Heal();
+		}
 	}
 }

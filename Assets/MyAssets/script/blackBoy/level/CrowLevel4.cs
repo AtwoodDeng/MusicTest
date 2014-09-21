@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class CrowLevel4 : BLevel {
+
+
+
 
 
 	public override void DealTrigger (string msg)
@@ -13,5 +17,7 @@ public class CrowLevel4 : BLevel {
 			shrinkHandMessage.AddMessage("both" , "1" );
 			BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , shrinkHandMessage );
 		}
+
+
 	}
 }

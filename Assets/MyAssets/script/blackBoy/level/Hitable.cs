@@ -10,11 +10,19 @@ public class Hitable : MonoBehaviour {
 	}
 	public SenseType senseType;
 
+	public enum EffectType
+	{
+		Removeable,
+		Unremoveable
+	}
+	public EffectType effectType = EffectType.Removeable;
+
 	public GameObject effect;
 
 	public float RelativeVelocityRate = 10f;
 	public float SizeRate = 0.1f;
 	public float HitScaleDiff = 0.1f;
+
 
 	public float splitTime = 0.05f;
 	private float timmer = 0f;
@@ -22,6 +30,8 @@ public class Hitable : MonoBehaviour {
 	public float minSpeed =0.1f;
 
 	public bool ifHurt = true;
+	public float HurtRate = 1.0f;
+
 
 	void Start()
 	{
@@ -56,9 +66,20 @@ public class Hitable : MonoBehaviour {
 			ParticleSystem ps = e.GetComponent<ParticleSystem>();
 			if ( ps != null )
 			{
-				ps.startSize *= ( 1 + Mathf.Pow( velocity.sqrMagnitude , 2f ) * SizeRate );
-				ps.emissionRate = velocity.sqrMagnitude * RelativeVelocityRate ;
-				ps.startLifetime *= ( 1 + Mathf.Pow( velocity.sqrMagnitude , 2f ) * SizeRate );
+				if ( effectType == EffectType.Removeable )
+				{
+					ps.startSize *= ( 1 + Mathf.Pow( velocity.sqrMagnitude , 2f ) * SizeRate );
+					ps.emissionRate = velocity.sqrMagnitude * RelativeVelocityRate ;
+					ps.startLifetime *= ( 1 + Mathf.Pow( velocity.sqrMagnitude , 2f ) * SizeRate );
+				}
+				else if ( effectType == EffectType.Unremoveable )
+				{
+					ps.startSize *= ( 1 + velocity.sqrMagnitude * SizeRate );
+					ps.maxParticles = (int)(velocity.sqrMagnitude * RelativeVelocityRate) ;
+					ps.emissionRate = 1000f;
+					ps.startLifetime = 9999f;
+
+				}
 
 			}
 
@@ -68,7 +89,7 @@ public class Hitable : MonoBehaviour {
 				HeroBody hb = col.collider.GetComponent<HeroBody>();
 				if ( hb != null )
 				{
-					hb.Harm( col.relativeVelocity );
+					hb.Harm( col.relativeVelocity * HurtRate );
 				}
 			}
 		}

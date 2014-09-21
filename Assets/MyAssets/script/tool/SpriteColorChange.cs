@@ -5,7 +5,7 @@ using Holoville.HOTween;
 public class SpriteColorChange : MonoBehaviour {
 
 	public float delay;
-	public float fadeInTime;
+	public float fadeTime;
 	public EaseType easeType;
 	public bool ifStartOnAwake;
 	public Color fromColor;
@@ -14,6 +14,7 @@ public class SpriteColorChange : MonoBehaviour {
 
 	public tk2dSprite sprite;
 	public tk2dTextMesh text;
+
 	
 	// Use this for initialization
 	void Awake () {
@@ -38,7 +39,7 @@ public class SpriteColorChange : MonoBehaviour {
 			if ( ifInitColor )
 				sprite.color = fromColor;
 			HOTween.To( sprite ,
-			           fadeInTime ,
+			           fadeTime ,
 			           "color" ,
 			           toColor ,
 			           false ,
@@ -50,7 +51,7 @@ public class SpriteColorChange : MonoBehaviour {
 			if ( ifInitColor )
 				text.color = fromColor;
 			HOTween.To( text ,
-			           fadeInTime ,
+			           fadeTime ,
 			           "color" ,
 			           toColor ,
 			           false ,

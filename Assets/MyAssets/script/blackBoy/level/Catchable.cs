@@ -40,7 +40,7 @@ public class Catchable : MonoBehaviour {
 	}
 	
 	
-	public void OnCatch(EventDefine eventName, object sender, EventArgs args)
+	public virtual void OnCatch(EventDefine eventName, object sender, EventArgs args)
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
 		if ( !msg.ContainMessage("CatchableID"))
@@ -51,6 +51,7 @@ public class Catchable : MonoBehaviour {
 			HandID = msg.GetMessage("HandID");
 			DealCatch(msg);
 		}
+
 	}
 	
 	public void OnShrink(EventDefine eventName, object sender, EventArgs args)

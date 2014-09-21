@@ -10,6 +10,7 @@ public class Triggerable : MonoBehaviour {
 	public string message="";
 	public bool isSendMessage = false;
 	public bool isDestroyOnEnter = false ;
+	public bool isDisableOnDestroy = true;
 	public bool isRefill = false;
 	public bool isSmallOnDestory = false;
 	public bool isBarrier = false;
@@ -28,6 +29,8 @@ public class Triggerable : MonoBehaviour {
 	public bool isUpdateWhenExit = false;
 	public bool isOnlyNontrigger = true;
 
+
+
 	// Use this for initialization
 	void Start () {
 		collider.isTrigger = true;
@@ -35,6 +38,7 @@ public class Triggerable : MonoBehaviour {
 	
 	void OnTriggerEnter( Collider collider)
 	{
+		Debug.Log("OnTriggerEnter tag" + collider.gameObject.tag);
 		if ( collider.isTrigger && isOnlyNontrigger )
 		{
 			//do nothing
@@ -94,10 +98,12 @@ public class Triggerable : MonoBehaviour {
 						//						autoDestory.StartAutoDestory();
 						
 					}
-					
-					isSendMessage = false;
-					isBarrier = false;
 
+					if ( isDisableOnDestroy )
+					{
+						isSendMessage = false;
+						isBarrier = false;
+					}
 					if ( isRefill )
 					{
 						SendMessageUpwards("RefillObj" , SendMessageOptions.DontRequireReceiver );

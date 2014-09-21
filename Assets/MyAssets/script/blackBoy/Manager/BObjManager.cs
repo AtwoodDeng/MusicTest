@@ -54,4 +54,28 @@ public class BObjManager : MonoBehaviour {
 		}
 	}
 	HeroBody _BHeroBody;
+
+	public GameObject[] RecoverPoints
+	{
+		get {
+			if ( _RecoverPoints == null )
+			{
+				_RecoverPoints = GameObject.FindGameObjectsWithTag( Global.RECOVER_POINT_TAG );
+			}
+			return _RecoverPoints;
+		}
+	}
+	GameObject[] _RecoverPoints;
+
+	public BLevel tempLevel
+	{
+		get {
+			if ( _tempLevel == null )
+			{
+				_tempLevel = World.GetComponent<BLevel>();
+			}
+			return _tempLevel;
+		}
+	}
+	BLevel _tempLevel;
 }
