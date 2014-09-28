@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using Holoville.HOTween;
 
 [RequireComponent(typeof(Rigidbody))]
 [RequireComponent(typeof(Collider))]
@@ -103,6 +104,14 @@ public class HeroHand : MonoBehaviour {
 		}
 	}
 
+	public Vector3 oriScale;
+	public float scaleShrinkRate = 0.2f;
+	public float scaleChangeTime = 1f;
+
+	public tk2dSprite sprite;
+	public string strenchSpriteName;
+	public string catchSpriteName;
+	public float bodyAngleAdjustRate = 0.5f;
 
 	// Use this for initialization
 	void Start () {
@@ -119,6 +128,11 @@ public class HeroHand : MonoBehaviour {
 //			stayAdhereEffectPrefabs[index] = 
 //				Resources.Load(Global.HandStayObjCatchEffect[key]) as GameObject;
 //		}
+
+		oriScale = transform.localScale;
+		transform.localScale *= scaleShrinkRate;
+
+		sprite = gameObject.GetComponent<tk2dSprite>();
 	}
 	
 	// Update is called once per frame
@@ -138,11 +152,41 @@ public class HeroHand : MonoBehaviour {
 		}else if ( state == HandState.Catch )
 		{
 			DoCatch();
+			DoAdjustBody();
 		}
+
+
 
 		if ( CheckLength())
 			Shrink();
 	}
+
+	public void DoAdjustBody()
+	{
+		if ( state == HandState.Catch )
+		{
+			if ( stayObjCatchable.getForceType() == ForceType.SpinAntiCW )
+			{
+				heroBody.DoFlipX( false );
+			}
+			else
+			{
+				heroBody.DoFlipX( true );
+			}
+
+			Vector3 toward = transform.position - heroBody.transform.position;
+			toward.z = 0;
+			float toAngle =  Vector3.Angle( new Vector3( 1f , 0, 0 ) , toward );
+			if ( toward.y < 0 )
+				toAngle = -toAngle;
+			toAngle -= 90f;
+
+			heroBody.transform.rotation = Quaternion.Euler( 0 , 0 , Global.adjustAngle( toAngle ) * bodyAngleAdjustRate 
+			                                               + Global.adjustAngle( heroBody.transform.eulerAngles.z ) * ( 1- bodyAngleAdjustRate)  );
+		}
+	}
+
+	
 
 	public void setRotationToward( Vector3 toward )
 	{
@@ -181,6 +225,16 @@ public class HeroHand : MonoBehaviour {
 //				angle += 180f;
 			setRotationToward(force);
 			throwTime = System.DateTime.Now;
+
+			HOTween.To( transform 
+			           , scaleChangeTime 
+			           , "localScale" 
+			           , oriScale
+			           , false 
+			           , EaseType.EaseOutCubic
+			           , 0
+			           );
+			sprite.SetSprite( strenchSpriteName );
 		}
 	}
 	public void Shrink()
@@ -206,6 +260,16 @@ public class HeroHand : MonoBehaviour {
 			BEventManager.Instance.PostEvent( EventDefine.OnShrink , msg );
 			stayAdhereObj.transform.parent = this.transform;
 			stayAdhereObj.transform.localPosition = Vector3.zero;
+
+			HOTween.To( transform 
+			           , scaleChangeTime
+			           , "localScale"
+			           , oriScale * scaleShrinkRate
+			           , false
+			           , EaseType.EaseInCubic
+			           , 0
+			           );
+			sprite.SetSprite( strenchSpriteName );
 		}
 	}
 
@@ -249,7 +313,7 @@ public class HeroHand : MonoBehaviour {
 			rigidbody.velocity = Vector3.zero;
 			state = HandState.Catch;
 
-			SetForceType( stayObjCatchable.getForceType() );
+			//SetForceType( stayObjCatchable.getForceType() );
 			CreateCatchEffect( stayPos );
 
 
@@ -265,11 +329,15 @@ public class HeroHand : MonoBehaviour {
 				msg.AddMessage( "CatchPositionGlobal" , Global.V32Str( pos ) );
 			}
 			BEventManager.Instance.PostEvent( EventDefine.OnCatch , msg );
+
+			//change sprite
+			sprite.SetSprite( catchSpriteName );
 		}
 	}
 
 	public void CreateCatchEffect( Vector3 position )
 	{
+		catchEffectPrefab =  getCatchEffect( stayObjCatchable.getForceType() );
 		if ( catchEffectPrefab != null )
 		{
 			GameObject catchEffectTemp = (GameObject)Instantiate( catchEffectPrefab );
@@ -545,14 +613,18 @@ public class HeroHand : MonoBehaviour {
 //		}
 	}
 
+	public static GameObject getCatchEffect( ForceType type )
+	{
+		return Resources.Load( Global.HandCatchEffectDict [ type.ToString() ] ) as GameObject;
+	}
+
 	public void SetForceType( ForceType toForceType )
 	{
 //		if ( forceType == toForceType )
 //			return ;
 //		Debug.Log("SetForceType" + " from " + forceType + " to " + toForceType );
 
-		catchEffectPrefab =  Resources.Load( Global.HandCatchEffectDict [ toForceType.ToString() ] ) as GameObject;
-
+		catchEffectPrefab =  getCatchEffect( toForceType );
 		if ( stayAdhereEffect != null )
 		{
 			AutoDestory destory = stayAdhereEffect.AddComponent<AutoDestory>();

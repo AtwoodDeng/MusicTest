@@ -101,7 +101,7 @@ public class BLevel : MonoBehaviour {
 		{
 			OnEnd(Global.EndLevelTime);
 		}
-		if ( Global.RECOVER_MSG.Equals( msg.Substring(0, Global.RECOVER_MSG.Length )) )
+		if ( msg.Length >= Global.RECOVER_MSG.Length && Global.RECOVER_MSG.Equals( msg.Substring(0, Global.RECOVER_MSG.Length )) )
 		{
 			if ( RecoverPoint == null || RecoverPoint.name != msg )
 			{

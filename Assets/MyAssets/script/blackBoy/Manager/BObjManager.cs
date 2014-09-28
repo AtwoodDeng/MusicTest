@@ -19,6 +19,18 @@ public class BObjManager : MonoBehaviour {
 	}
 	GameObject _World;
 
+	public GameObject BackFlows
+	{
+		get {
+			if ( _BackFlows == null )
+			{
+				_BackFlows = GameObject.Find( "BackFlows" );
+			}
+			return _BackFlows;
+		}
+	}
+	GameObject _BackFlows;
+
 	public GameObject Effect
 	{
 		get {

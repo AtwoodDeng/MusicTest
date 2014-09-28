@@ -14,8 +14,9 @@ public class BlackWhiteRock : Catchable {
 
 	public SpinType spinType;
 	public bool ifEnableWhenHeroLeave = false;
+	public string name = "";
 
-	void Awake()
+	protected void Awake()
 	{
 		gameObject.tag = "ROCK";
 		if ( ifEnableWhenHeroLeave )
@@ -42,7 +43,28 @@ public class BlackWhiteRock : Catchable {
 		return Vector3.zero;
 	}
 
-	public override HeroHand.ForceType getForceType ()
+	static public HeroHand.ForceType getForceType ( SpinType _spinType)
+	{
+		switch ( _spinType )
+		{
+		case SpinType.AntiClockwise:
+			return HeroHand.ForceType.SpinAntiCW;
+			break;
+		case SpinType.Black:
+			return HeroHand.ForceType.SpinAntiCW;
+			break;
+		case SpinType.Clockwise:
+			return HeroHand.ForceType.SpinCW;
+			break;
+		case SpinType.White:
+			return HeroHand.ForceType.SpinCW;
+			break;
+		}
+		return HeroHand.ForceType.None;
+	
+	}
+
+	public override HeroHand.ForceType getForceType ( )
 	{
 		switch ( spinType )
 		{
@@ -60,7 +82,7 @@ public class BlackWhiteRock : Catchable {
 			break;
 		}
 		return base.getForceType();
-	
+		
 	}
 
 	public void OnTriggerExit( Collider col )
@@ -74,6 +96,7 @@ public class BlackWhiteRock : Catchable {
 	public override void DealCatch( MessageEventArgs msg )
 	{
 		msg.AddMessageReplace("type" , spinType.ToString() );
+		msg.AddMessage("BWname" , name );
 		BEventManager.Instance.PostEvent( EventDefine.OnAfterCatch , msg );
 	}
 }

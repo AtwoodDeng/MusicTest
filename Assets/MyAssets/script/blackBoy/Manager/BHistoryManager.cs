@@ -31,28 +31,39 @@ public class BHistoryManager : MonoBehaviour {
 
 	public class LevelHistory
 	{
-		string levelName;
+		public string levelName;
 		List<ClickEntry> clickList = new List<ClickEntry>();
 		List<CatchEntry> catchList = new List<CatchEntry>();
 		static char SPLIT_ITEM = '\n';
 		static char SPLIT_ENTRY = '|';
 		static char SPLIT_LIST = '=';
+		public int depth = 0;
 
-		public string LvlName2Doc( string levelName , string docName ="" )
+		public LevelHistory( int _dep )
+		{
+			depth = _dep;
+		}
+
+		static public string LvlName2Doc( string levelName , string docName ="" )
 		{
 			if ( docName == "" )
-				return System.Environment.CurrentDirectory + "/" + Global.OPP_HISTORY_DIR + "/" + levelName;
-			return System.Environment.CurrentDirectory + "/" + Global.OPP_HISTORY_DIR + "/" + levelName + "/" + docName;
+				return Directory.GetCurrentDirectory() + "/" + Global.OPP_HISTORY_DIR + "/" + levelName;
+			return Directory.GetCurrentDirectory() + "/" + Global.OPP_HISTORY_DIR + "/" + levelName + "/" + docName;
+		}
+
+		static public  string[] GetDocNameList( string levelName )
+		{
+			return Directory.GetFiles( LvlName2Doc( levelName ));
 		}
 
 		public void LoadFromDir( string lvlName , string docName )
 		{
 
 			levelName = lvlName;
-			if ( File.Exists( LvlName2Doc( lvlName , docName ) ) )
+			if ( File.Exists( docName ) )
 			{
 				try{
-					StreamReader sr = new StreamReader( LvlName2Doc( lvlName , docName ) );
+					StreamReader sr = new StreamReader( docName );
 					string text = sr.ReadToEnd();
 					string[] lists = text.Split(SPLIT_LIST);
 					LoadClickList( lists[0] );
@@ -71,6 +82,8 @@ public class BHistoryManager : MonoBehaviour {
 			foreach( string item in items )
 			{
 				string[] entries = item.Split(SPLIT_ENTRY);
+				if ( string.IsNullOrEmpty( entries[0] ) || string.IsNullOrEmpty( entries[1] ))
+					continue;
 				addClick( float.Parse( entries[0]) , Global.Str2V3(entries[1]) );
 			}
 		}
@@ -81,6 +94,10 @@ public class BHistoryManager : MonoBehaviour {
 			foreach( string item in items )
 			{
 				string[] entries = item.Split(SPLIT_ENTRY);
+				if ( string.IsNullOrEmpty( entries[0] ) 
+				    || string.IsNullOrEmpty( entries[1] )
+				    || string.IsNullOrEmpty( entries[2] ) )
+					continue;
 				addCatch( float.Parse( entries[0] ) 
 				         , Global.Str2V3( entries[1] )
 				         , (BlackWhiteRock.SpinType)Enum.Parse(typeof(BlackWhiteRock.SpinType) , entries[2]) );
@@ -113,7 +130,7 @@ public class BHistoryManager : MonoBehaviour {
 			string res = "";
 			for( int i = 0 ; i < clickList.Count ; ++ i )
 			{
-				res += clickList[i].time + SPLIT_ENTRY 
+				res += clickList[i].time.ToString() + SPLIT_ENTRY 
 					+ Global.V32Str( clickList[i].position ) + SPLIT_ITEM;
 			}
 			res += SPLIT_LIST;
@@ -124,7 +141,7 @@ public class BHistoryManager : MonoBehaviour {
 			string res = "";
 			for( int i = 0 ; i < catchList.Count ; ++ i )
 			{
-				res += catchList[i].time + SPLIT_ENTRY 
+				res += catchList[i].time.ToString() + SPLIT_ENTRY 
 					+ Global.V32Str( catchList[i].position ) + SPLIT_ENTRY
 					+ catchList[i].type.ToString() + SPLIT_ITEM;
 			}
@@ -140,31 +157,51 @@ public class BHistoryManager : MonoBehaviour {
 		{
 			catchList.Add( new CatchEntry( time , pos , type ));
 		}
+
+		int clickInd = 0;
+		int catchInd = 0;
+
+		public ClickEntry getClick( float time )
+		{
+			if ( clickInd < clickList.Count && time > clickList[clickInd].time )
+			{
+				return clickList[clickInd++];
+			}
+			return null;
+		}
+
+		public CatchEntry getCatch( float time )
+		{
+			if ( catchInd < catchList.Count && time > catchList[catchInd].time )
+			{
+				return catchList[catchInd++];
+			}
+			return null;
+		}
+
+		public void Refresh()
+		{
+			clickInd = catchInd = 0;
+		}
+
 	}
 
 
 	public LevelHistory currentHis;
 	public List<LevelHistory> hisList = new List<LevelHistory>();
 
-	void Awake()
-	{
-		LoadHistories();
-		currentHis = new LevelHistory();
-	}
 
-	void LoadHistories()
-	{
-		hisList.Clear();
-	}
 
 	void OnEnable() {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMouseClick , OnMouseClick );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnAfterCatch , OnAfterCatch );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnBackClick , OnBackClick );
 	}
 	
 	void OnDisable() {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMouseClick , OnMouseClick);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnAfterCatch , OnAfterCatch);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnBackClick , OnBackClick);
 	}
 
 	public void OnMouseClick(EventDefine eventName, object sender, EventArgs args)
@@ -183,6 +220,51 @@ public class BHistoryManager : MonoBehaviour {
 		BlackWhiteRock.SpinType type = (BlackWhiteRock.SpinType)Enum.Parse( typeof(BlackWhiteRock.SpinType) , msg.GetMessage("type"));
 		currentHis.addCatch( time ,pos , type);
 	}
+	public void OnBackClick(EventDefine eventName, object sender, EventArgs args)
+	{
+		MessageEventArgs msg = (MessageEventArgs)args;
+		GameObject effectPre = Resources.Load( Global.MouseBackClickEffectPath ) as GameObject;
+		GameObject effect = Instantiate( effectPre ) as GameObject;
+		effect.transform.parent = BObjManager.Instance.Effect.transform;
+		effect.transform.position = Global.Str2V3( msg.GetMessage( "globalPos" ) );
+
+		if ( msg.ContainMessage( "HisDep" ) )
+		{
+			int depth = int.Parse( msg.GetMessage( "HisDep" ));
+			ParticleSystem[] particles = effect.GetComponentsInChildren<ParticleSystem>();
+			foreach ( ParticleSystem p in particles )
+			{
+				Color col = p.startColor;
+				col.a *= DepthConceal( depth );
+				p.startColor = col;
+			}
+		}
+	}
+
+	string levelName;
+
+
+	void Awake()
+	{
+		LoadHistories();
+		currentHis = new LevelHistory(-1);
+	}
+	
+	void LoadHistories()
+	{
+		hisList.Clear();
+		levelName = BObjManager.Instance.tempLevel.levelName;
+		string[] files = LevelHistory.GetDocNameList( levelName );
+		int dep = 0;
+		for( int i = files.Length -1 ; i > files.Length - Global.HIS_SHOW_NUMBER - 1 
+		    && i >= 0; i-- )
+		{
+			LevelHistory his = new LevelHistory( dep++ );
+			his.LoadFromDir( levelName , files[i] );
+			hisList.Add( his );
+		}
+
+	}
 
 	void Update()
 	{
@@ -191,9 +273,59 @@ public class BHistoryManager : MonoBehaviour {
 			currentHis.SaveToDir();
 			Debug.Log( "save to " + Directory.GetCurrentDirectory() );
 		}
+		float time = BObjManager.Instance.tempLevel.time;
+		foreach( LevelHistory his in hisList )
+		{
+			HisClick( his.getClick( time ) , his.depth );
+			HisCatch( his.getCatch( time ) , his.depth );
+		}
+	}
+	void HisClick( ClickEntry click , int dep )
+	{
+		if ( click == null )
+			return;
+		MessageEventArgs msg = new MessageEventArgs();
+		msg.AddMessage( "HisDep" , dep.ToString() );
+		msg.AddMessage( "globalPos" , Global.V32Str( click.position ) );
+		BEventManager.Instance.PostEvent( EventDefine.OnBackClick , msg );
+
+	}
+	void HisCatch( CatchEntry cat , int dep )
+	{
+		if ( cat == null )
+			return;
+
+		GameObject effectPre = HeroHand.getCatchEffect( BlackWhiteRock.getForceType( cat.type) );
+		CreateEffectAt( effectPre , cat.position ,dep );
 	}
 
+	void CreateEffectAt( GameObject effectPre, Vector3 pos , int dep)
+	{
+		GameObject effect = Instantiate( effectPre  ) as GameObject;
+		effect.transform.parent = BObjManager.Instance.Effect.transform;
+		effect.transform.position = pos;
 
+		ParticleSystem[] particles = effect.GetComponentsInChildren<ParticleSystem>();
+		for( int i = 0 ;i < particles.Length ; ++i )
+		{
+			particles[i].startColor = adjustColor( particles[i].startColor , dep );
+		}
+	}
+
+	public Color adjustColor( Color col , int dep )
+	{
+		Color res = col;
+		res.a *= DepthConceal( dep );
+		res.r = ( res.r + 0.5f ) / 2;
+		res.g = ( res.g + 0.5f ) / 2;
+		res.b = ( res.b + 0.5f ) / 2;
+		return res;
+	}
+
+	float DepthConceal( int depth )
+	{
+		return ( 1 - ( depth + 1 ) / ( Global.HIS_SHOW_NUMBER + 1 ) ) * 0.5f;
+	}
 
 }
 

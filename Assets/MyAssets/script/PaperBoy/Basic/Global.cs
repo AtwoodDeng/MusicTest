@@ -52,7 +52,7 @@ public static class Global {
 		{"SpinCW" , "Effect/Hero/DropSmallCW"},
 		{"SpinAntiCW" , "Effect/Hero/DropSmallAntiCW"},
 		{"Pull" , "Effect/Hero/DotSmall"},
-		{"None", ""}};
+		{"None", "Effect/Hero/DotSmall"}};
 	public static Dictionary<string,string> HandStayObjCatchEffect
 	= new Dictionary<string, string> {
 //		{"SpinCW" , "Effect/Hero/FeatherSpinCW"},
@@ -63,9 +63,9 @@ public static class Global {
 		{"None", "Effect/Hero/DotSmall"}};
 	public static Dictionary<string,string> ArmCatchEffectDict
 	= new Dictionary<string, string> {
-		{"SpinCW" , "Effect/Hero/FeatherStable"},
-		{"SpinAntiCW" , "Effect/Hero/FeatherStable"},
-		{"Pull" , "Effect/Hero/FeatherCW"},
+		{"SpinCW" , ""},
+		{"SpinAntiCW" , ""},
+		{"Pull" , "Effect/Hero/FeatherStable"},
 		{"None", ""}};
 	public static Dictionary<string,string> CursorDict
 	= new Dictionary<string, string> {
@@ -177,5 +177,18 @@ public static class Global {
 
 	public static string OPP_HISTORY_DIR = "crow.app/Contents/Resources/His";
 	public static string OPP_HISTORY_SUFFIX = ".his";
+
+	public static int HIS_SHOW_NUMBER = 5;
+
+	public static string MouseBackClickEffectPath = "Effect/Hero/DotSmall";
+
+	public static float adjustAngle( float _angle)
+	{
+		while ( _angle > 180f )
+			_angle -= 360f;
+		while ( _angle < -180f )
+			_angle += 360f;
+		return _angle;
+	}
 
 }

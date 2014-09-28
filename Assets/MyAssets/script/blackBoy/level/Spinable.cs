@@ -112,12 +112,15 @@ public class Spinable : Catchable {
 		GUIDebug.add( ShowType.label , "Arm " + forceArm );
 		GUIDebug.add(ShowType.label , "Torque " + torque * 10 + " " + torque.z );
 
+		
+		GUIDebug.add(ShowType.label , "energy " + nowTestEnergy.ToString() );
 		//test spin
 		if ( TestReady ( torque ) )
 		{
 			nowTestTime += deltaTime;
 			nowTestEnergy += deltaTime * Math.Abs( torque.z ) ;
 			DoTestSpin( deltaTime );
+
 		}else
 		{
 			nowTestTime = 0f;

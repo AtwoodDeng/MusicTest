@@ -30,7 +30,7 @@ public class Triggerable : MonoBehaviour {
 	public bool isOnlyNontrigger = true;
 
 
-
+	public float handSenseRange = 0;
 	// Use this for initialization
 	void Start () {
 		collider.isTrigger = true;
@@ -44,7 +44,7 @@ public class Triggerable : MonoBehaviour {
 			//do nothing
 		}else 
 		{
-			if ( senseTags.Contains( collider.tag ))
+			if ( senseTags.Contains( collider.tag ) )
 			{
 				if ( isSendMessage )
 				{
@@ -120,13 +120,14 @@ public class Triggerable : MonoBehaviour {
 			}
 		}
 	}
+	
 
-	void OnTriggerExit( Collider collider )
-	{
-		if ( isUpdateWhenExit )
-			if ( senseTags.Contains( collider.tag ) && collider.gameObject == obj )
-				{}
-	}
+//	void OnTriggerExit( Collider collider )
+//	{
+//		if ( isUpdateWhenExit )
+//			if ( senseTags.Contains( collider.tag ) && collider.gameObject == obj )
+//				{}
+//	}
 
 
 }

@@ -25,15 +25,20 @@ public class BackFlowObj : MonoBehaviour {
 	public float timeRange = 5f;
 	public BackFlowCreator parent;
 
-	protected void OnEnable() {
-		BEventManager.Instance.RegisterEvent (EventDefine.OnBackClick ,OnBackClick );
-	}
-	
-	protected void OnDisable() {
-		BEventManager.Instance.UnregisterEvent (EventDefine.OnBackClick, OnBackClick);
+//	protected void OnEnable() {
+//		BEventManager.Instance.RegisterEvent (EventDefine.OnBackClick ,OnBackClick );
+//	}
+//	
+//	protected void OnDisable() {
+//		BEventManager.Instance.UnregisterEvent (EventDefine.OnBackClick, OnBackClick);
+//	}
+
+	 void OnBackClick(EventDefine eventName, object sender, EventArgs args)
+	{
+		BackClick( args );
 	}
 
-	void OnBackClick(EventDefine eventName, object sender, EventArgs args)
+	public void BackClick(EventArgs args)
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
 		Vector3 ClickPos = Global.Str2V3( msg.GetMessage( "globalPos" ));
@@ -48,6 +53,12 @@ public class BackFlowObj : MonoBehaviour {
 
 	// Use this for initialization
 	void Awake () {
+		Init();
+		Refresh();
+	}
+
+	public void Init(){
+
 		if (sprite == null )
 			sprite = gameObject.GetComponent<tk2dSprite>();
 
@@ -56,7 +67,7 @@ public class BackFlowObj : MonoBehaviour {
 		transform.localScale *= scaleDiff;
 		rigidbody.mass *= scaleDiff * scaleDiff;
 
-
+		
 		//set color
 		Color col = sprite.color;
 		float colDiff = UnityEngine.Random.Range( -colorFloat , colorFloat );
@@ -66,6 +77,16 @@ public class BackFlowObj : MonoBehaviour {
 		col.a = Mathf.Lerp( 0 , 1 , col.a + UnityEngine.Random.Range( -alphaFloat , alphaFloat ));
 		sprite.color = col;
 
+		//setting
+		rigidbody.useGravity = false;
+		timeOffset = UnityEngine.Random.Range( -10f , 10f);
+		transform.Rotate( new Vector3( 0 , 0 , UnityEngine.Random.Range( 0 , 360f )));
+	}
+	public void Refresh() {
+		//active
+		gameObject.SetActive( true );
+
+		Color col;
 		//appear animator
 		float temp_a = sprite.color.a;
 		col = sprite.color;
@@ -73,11 +94,6 @@ public class BackFlowObj : MonoBehaviour {
 		sprite.color = col;
 		col.a = temp_a;
 		HOTween.To( sprite , appearTime , new TweenParms().Prop("color" , col ) );
-
-		//setting
-		rigidbody.useGravity = false;
-		timeOffset = UnityEngine.Random.Range( -10f , 10f);
-		transform.Rotate( new Vector3( 0 , 0 , UnityEngine.Random.Range( 0 , 360f )));
 
 	}
 
@@ -99,10 +115,14 @@ public class BackFlowObj : MonoBehaviour {
 	}
 
 	void OnBecameInvisible(){
-		if ( parent != null )
-			parent.destoryObj(this);
-		AutoDestory destory = gameObject.AddComponent<AutoDestory>();
-		destory.destroyTime = 1f;
-		destory.StartAutoDestory();
+		gameObject.SetActive(false);
+		if (parent != null )
+			parent.disactiveObj( this );
+//		if ( parent != null )
+//			parent.destoryObj(this);
+//		AutoDestory destory = gameObject.AddComponent<AutoDestory>();
+//		destory.destroyTime = 0.1f;
+//		destory.StartAutoDestory();
+//		enabled = false;
 	}
 }

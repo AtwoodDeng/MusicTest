@@ -186,6 +186,8 @@ public class HeroBody : MonoBehaviour {
 		}
 	}
 
+	public tk2dSprite sprite;
+
 	void Start()
 	{
 		leftHandGroup = new HandGroup(this);
@@ -204,7 +206,7 @@ public class HeroBody : MonoBehaviour {
 			ScreenCloud = Instantiate( scPre ) as GameObject;
 			ScreenCloud.transform.parent = BObjManager.Instance.Effect.transform;
 		}
-
+		sprite = gameObject.GetComponent<tk2dSprite>();
 	}
 
 
@@ -251,6 +253,7 @@ public class HeroBody : MonoBehaviour {
 //			}
 //		}
 //		CreateCatchEffect( type );
+//
 //
 //	}
 //
@@ -532,6 +535,51 @@ public class HeroBody : MonoBehaviour {
 //		Vector3 pos = transform.position;
 //		pos.z = Global.BHeroPosition.z;
 //		transform.position  = pos ;
+
+		//set Rotation
+		SetRotation();
+
+	}
+
+
+	public float bodyAngleAdjustRate = 0.5f;
+	public float maxTolerateAngle = 45f;
+
+	
+	
+	public GameObject smoke;
+
+	public void SetRotation()
+	{
+		if ( leftHandGroup.state != HandGroup.HandGroupState.Catch
+		    && rightHandGroup.state != HandGroup.HandGroupState.Catch )
+		{
+			GUIDebug.add( ShowType.label , "Body set rotation " );
+			if ( Math.Abs( Global.adjustAngle( transform.eulerAngles.z ) ) > maxTolerateAngle )
+			{
+				float toAngle = 0;
+				transform.rotation = Quaternion.Euler( 0 , 0 , Global.adjustAngle( toAngle ) * bodyAngleAdjustRate 
+				                                               + Global.adjustAngle( transform.eulerAngles.z ) * ( 1- bodyAngleAdjustRate)  );
+			}
+		}
+		smoke.transform.rotation = Quaternion.Euler( 0 , 0 , 0 );
+	}
+	public void DoFlipX( bool isLeft )
+	{
+		sprite.FlipX = isLeft;
+		if ( isLeft )
+		{
+			Vector3 location = smoke.transform.localPosition;
+			location.x = - Math.Abs( location.x );
+			smoke.transform.localPosition = location;
+		}
+		else
+		{
+			Vector3 location = smoke.transform.localPosition;
+			location.x = Math.Abs( location.x );
+			smoke.transform.localPosition = location;
+		}
+
 	}
 
 	private float forceTimer = 0f;
