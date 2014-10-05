@@ -50,6 +50,7 @@ public class BLogicManager : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnMouseClick ,OnMouseClick );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShowText ,OnShowText );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnShowTips ,OnShowTips );
+		BEventManager.Instance.RegisterEvent (EventDefine.OnShowWord ,OnShowWord );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnFreezen ,OnFreezen );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnUnfreezen ,OnUnfreezen );
 		BEventManager.Instance.RegisterEvent (EventDefine.OnFrontMenu ,OnFrontMenu );
@@ -62,6 +63,7 @@ public class BLogicManager : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnMouseClick, OnMouseClick);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShowText ,OnShowText );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnShowTips ,OnShowTips );
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnShowWord ,OnShowWord );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnFreezen ,OnFreezen );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnUnfreezen ,OnUnfreezen );
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnFrontMenu ,OnFrontMenu );
@@ -163,7 +165,25 @@ public class BLogicManager : MonoBehaviour {
 			ShowText( text , showTime , disappearTime );
 		
 	}
-	
+
+	public void OnShowWord(EventDefine eventName, object sender, EventArgs args)
+	{
+		MessageEventArgs msg = (MessageEventArgs)args;
+		string text = "";
+		float showTime = Global.TextShowTime;
+		float disappearTime = Global.TextDisappearTime;
+		Vector3 pos=Vector3.zero;
+		if ( msg.ContainMessage("text") )
+			text = msg.GetMessage("text");
+		if ( msg.ContainMessage("showTime"))
+			showTime = float.Parse( msg.GetMessage("showTime"));
+		if ( msg.ContainMessage("disappearTime"))
+			disappearTime = float.Parse( msg.GetMessage("disappearTime"));
+		if ( msg.ContainMessage("pos" ))
+			pos = Global.Str2V3( msg.GetMessage("pos"));
+		ShowWord( text ,pos, showTime , disappearTime );
+		
+	}
 	
 	public void OnMouseClick(EventDefine eventName, object sender, EventArgs args)
 	{
@@ -175,16 +195,18 @@ public class BLogicManager : MonoBehaviour {
 			if ( Global.MouseLeft.Equals( msg.GetMessage("type")))
 			{
 				msg.AddMessage("isLeft", Boolean.TrueString );
-				BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
-				BEventManager.Instance.PostEvent( EventDefine.OnBackClick , args );
+				BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , msg );
+				BEventManager.Instance.PostEvent( EventDefine.OnBackClick , msg );
 			}
 			
 			if ( Global.MouseRight.Equals( msg.GetMessage("type")))
 			{
 	//			msg.AddMessage("isLeft", Boolean.FalseString );
 	//			BEventManager.Instance.PostEvent( EventDefine.OnMoveHand , args );
-				msg.AddMessage("isLeft" , Boolean.FalseString );
-				BEventManager.Instance.PostEvent( EventDefine.OnChangeForce , args );
+				//msg.AddMessage("isLeft" , Boolean.FalseString );
+//				BEventManager.Instance.PostEvent( EventDefine.OnChangeForce , args );
+				msg.AddMessage("both" , "1" );
+				BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , msg ); 
 			}
 		}
 	}
@@ -337,6 +359,62 @@ public class BLogicManager : MonoBehaviour {
 
 		if ( tips.Count <= 0 )
 			BEventManager.Instance.PostEvent( EventDefine.OnUnfreezen , new MessageEventArgs () );
+	}
+
+	public void ShowWord( string text , Vector3 pos , float showTime = 2f , float disappearTime = 3f)
+	{
+		Debug.Log("ShowTips");
+		//create text object
+		GameObject wordPrefab = Resources.Load(Global.WordPrefabPath) as GameObject;
+		GameObject wordObj = Instantiate( wordPrefab ) as GameObject;
+		wordObj.transform.parent = BObjManager.Instance.Effect.transform;
+		wordObj.transform.localPosition = Vector3.zero;
+		wordObj.transform.localScale = Vector3.one;
+		wordObj.transform.rotation = Quaternion.Euler( 0 , 0 , UnityEngine.Random.Range( - Global.WordRotateAngle , Global.WordRotateAngle ) );
+
+
+		//set the message
+		tk2dTextMesh textMesh = wordObj.GetComponent<tk2dTextMesh>();
+		if ( textMesh == null )
+		{
+			Debug.Log("Cannot find TextMesh");
+			return;
+		}
+		textMesh.text = text;
+		
+		
+		//set the follow 
+//		Vector3 initpos = BObjManager.Instance.Hero.transform.position;
+		Debug.Log( "NumDrawnChara" + textMesh.NumDrawnCharacters() );
+		Debug.Log( "invOrthoSize" + textMesh.font.largestWidth );
+		Debug.Log( "textMesh" + textMesh.scale.x );
+//		initpos.x -= textMesh.NumDrawnCharacters() / 2 * textMesh.font.largestWidth * textMesh.scale.x / 2;
+		wordObj.transform.position = pos;
+//		BFollowWith follow =  wordObj.AddComponent<BFollowWith>();
+//		follow.followState = BFollowWith.FollowState.Relatively;
+//		follow.UpdateTarget( BObjManager.Instance.Hero );
+		
+		//set the effect
+//		Color toCol = textMesh.color;
+//		toCol.a = 0;
+//		HOTween.To( textMesh 
+//		           , disappearTime
+//		           , "color"
+//		           , toCol
+//		           , false 
+//		           , EaseType.Linear
+//		           , showTime );
+		
+		//auto destory
+//		AutoDestory destory = wordObj.AddComponent<AutoDestory>();
+//		destory.destroyTime = showTime + disappearTime;
+//		destory.StartAutoDestory();
+		
+		//freezen
+//		BEventManager.Instance.PostEvent( EventDefine.OnFreezen , new MessageEventArgs() );
+//		
+//		if ( tips.Count <= 0 )
+//			BEventManager.Instance.PostEvent( EventDefine.OnUnfreezen , new MessageEventArgs () );
 	}
 
 	void Update()

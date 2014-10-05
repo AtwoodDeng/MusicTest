@@ -51,9 +51,11 @@ public class BHistoryManager : MonoBehaviour {
 			return Directory.GetCurrentDirectory() + "/" + Global.OPP_HISTORY_DIR + "/" + levelName + "/" + docName;
 		}
 
-		static public  string[] GetDocNameList( string levelName )
+		static public string[] GetDocNameList( string levelName )
 		{
-			return Directory.GetFiles( LvlName2Doc( levelName ));
+			if ( Directory.Exists( LvlName2Doc( levelName ) ) )
+				return Directory.GetFiles( LvlName2Doc( levelName ));
+			return null;
 		}
 
 		public void LoadFromDir( string lvlName , string docName )
@@ -256,13 +258,14 @@ public class BHistoryManager : MonoBehaviour {
 		levelName = BObjManager.Instance.tempLevel.levelName;
 		string[] files = LevelHistory.GetDocNameList( levelName );
 		int dep = 0;
-		for( int i = files.Length -1 ; i > files.Length - Global.HIS_SHOW_NUMBER - 1 
-		    && i >= 0; i-- )
-		{
-			LevelHistory his = new LevelHistory( dep++ );
-			his.LoadFromDir( levelName , files[i] );
-			hisList.Add( his );
-		}
+		if ( files != null )
+			for( int i = files.Length -1 ; i > files.Length - Global.HIS_SHOW_NUMBER - 1 
+			    && i >= 0; i-- )
+			{
+				LevelHistory his = new LevelHistory( dep++ );
+				his.LoadFromDir( levelName , files[i] );
+				hisList.Add( his );
+			}
 
 	}
 

@@ -105,12 +105,14 @@ public static class Global {
 	public static string EmptyPrefabPath = "Tool/Prefab/Empty";
 	public static string TextPrefabPath = "Tool/Prefab/Text";
 	public static string TipsPrefabPath = "Tool/Prefab/Tips";
+	public static string WordPrefabPath = "Tool/Prefab/Word";
 	public static float TextFontRate = 0.5f;
 	public static float TextRelativelyRate = 0.12f;
 	public static float TextShowTime = 2f;
 	public static float TextDisappearTime = 1f;
 	public static float TipsShowTime = 2.2f;
 	public static float TipsDisappearTime = 0.1f;
+	public static float WordRotateAngle = 30f;
 
 	
 	public static string BeginPointEffect = "Effect/level/BeginLevel";

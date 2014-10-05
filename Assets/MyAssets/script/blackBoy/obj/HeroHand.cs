@@ -138,6 +138,9 @@ public class HeroHand : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 //		GUIDebug.add(ShowType.label , state.ToString() );
+
+		GUIDebug.add( ShowType.label , " length " + transform.localPosition.sqrMagnitude );
+
 		if ( state == HandState.Fly )
 		{
 			DateTime now = System.DateTime.Now;

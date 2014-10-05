@@ -26,6 +26,7 @@ public enum EventDefine{
 	OnShowText ,
 	OnTriggerable ,
 	OnShowTips,
+	OnShowWord,
 
 	OnFreezen,
 	OnUnfreezen,

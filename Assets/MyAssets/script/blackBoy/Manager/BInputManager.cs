@@ -144,6 +144,7 @@ public class BInputManager : MonoBehaviour {
 			MessageEventArgs msg = new MessageEventArgs();
 			msg.AddMessage("posX" , mousePos.x.ToString() );
 			msg.AddMessage("posY" , mousePos.y.ToString() );
+			msg.AddMessage("mousePos" , Global.V32Str( mousePos ) );
 			msg.AddMessage("type" , Global.MouseLeft );
 			msg.AddMessage("globalPos" , Global.V32Str( mousePosGlobal) );
 			BEventManager.Instance.PostEvent(EventDefine.OnMouseClick , msg );
@@ -169,6 +170,7 @@ public class BInputManager : MonoBehaviour {
 			MessageEventArgs msg = new MessageEventArgs();
 			msg.AddMessage("posX" , mousePos.x.ToString() );
 			msg.AddMessage("posY" , mousePos.y.ToString() );
+			msg.AddMessage("mousePos" , Global.V32Str( mousePos ) );
 			msg.AddMessage("globalPos" , Global.V32Str( mousePosGlobal) );
 			msg.AddMessage("type" , Global.MouseRight );
 			BEventManager.Instance.PostEvent(EventDefine.OnMouseClick , msg );

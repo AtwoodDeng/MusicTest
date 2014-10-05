@@ -28,6 +28,7 @@ public class Spining : MonoBehaviour {
 		           , SpinDuration 
 		           , new TweenParms()
 		           .Prop( "eulerAngles" , new Vector3( 0 , 0 , angle ) , true )
+		           .Ease( SpinEaseType )
 		           .Loops( SpinLoopTimes , SpinLoopType )
 		           );
 	}

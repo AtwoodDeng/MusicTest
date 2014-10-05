@@ -7,6 +7,7 @@ public class CrowLevel4 : BLevel {
 
 	public List<TwoSideSpin> backVillCitys = new List<TwoSideSpin>();
 
+
 	protected void OnEnable() {
 		base.OnEnable();
 		BEventManager.Instance.RegisterEvent (EventDefine.OnAfterCatch ,OnAfterCatch );
@@ -57,7 +58,17 @@ public class CrowLevel4 : BLevel {
 			shrinkHandMessage.AddMessage("both" , "1" );
 			BEventManager.Instance.PostEvent( EventDefine.OnShrinkHand , shrinkHandMessage );
 		}
+		if ( "out_of_range".Equals(msg))
+		{
+			Restart(""); 
+		}
 
-
+	}
+	public override void DealTrigger ( MessageEventArgs msg )
+	{
+		if ( "get_mind".Equals( msg.GetMessage( Global.TriggableMessage )) )
+		{
+			showWord( "get mind" , msg.GetMessage("pos") );
+		}
 	}
 }

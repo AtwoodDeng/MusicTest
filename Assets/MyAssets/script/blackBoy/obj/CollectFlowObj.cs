@@ -11,6 +11,9 @@ public class CollectFlowObj : MonoBehaviour {
 	private  float timeOffset = 0;
 	public float timeRange = 5f;
 	public float DiffRangeInAwake = 2f;
+	public float RotateAngleAwake = 360f;
+
+	public string word;
 
 	// Use this for initialization
 	void Awake () {
@@ -18,7 +21,7 @@ public class CollectFlowObj : MonoBehaviour {
 		//setting
 		rigidbody.useGravity = false;
 		timeOffset = UnityEngine.Random.Range( -10f , 10f);
-		transform.Rotate( new Vector3( 0 , 0 , UnityEngine.Random.Range( 0 , 360f )));
+		transform.Rotate( new Vector3( 0 , 0 , UnityEngine.Random.Range( 0 , RotateAngleAwake )));
 
 		transform.position += getRandomDir() * DiffRangeInAwake;
 	}
@@ -41,4 +44,5 @@ public class CollectFlowObj : MonoBehaviour {
 //		rigidbody.AddTorque( getRandomTorque() * TorqueIntense * Mathf.Sin(Time.time * 2 * Mathf.PI / timeRange + timeOffset) , ForceMode.Force );
 	
 	}
+	
 }

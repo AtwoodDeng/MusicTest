@@ -50,6 +50,7 @@ public class Triggerable : MonoBehaviour {
 				{
 					MessageEventArgs msg = new MessageEventArgs();
 					msg.AddMessage("msg" , message );
+					msg.AddMessage("pos" , Global.V32Str( transform.position ) );
 					BEventManager.Instance.PostEvent( EventDefine.OnTriggerable , msg );
 				}
 

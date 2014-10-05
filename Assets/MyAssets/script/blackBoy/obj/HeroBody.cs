@@ -220,7 +220,7 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.RegisterEvent (EventDefine.OnStop, OnStop);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnBack, OnBack);
 		BEventManager.Instance.RegisterEvent (EventDefine.OnTriggerable, OnTriggerable);
-//		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
+		BEventManager.Instance.RegisterEvent (EventDefine.OnCatch, OnCatch);
 
 	}
 	
@@ -234,7 +234,7 @@ public class HeroBody : MonoBehaviour {
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnStop, OnStop);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnBack, OnBack);
 		BEventManager.Instance.UnregisterEvent (EventDefine.OnTriggerable, OnTriggerable);
-//		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
+		BEventManager.Instance.UnregisterEvent (EventDefine.OnCatch, OnCatch);
 	}
 //
 //	public void OnCatch(EventDefine eventName, object sender, EventArgs args)
@@ -281,6 +281,21 @@ public class HeroBody : MonoBehaviour {
 //
 //
 //	}
+
+	public void OnCatch(EventDefine eventName, object sender, EventArgs args)
+	{
+		//judge which hand
+		MessageEventArgs msg = (MessageEventArgs)args;
+		if ( msg.ContainMessage("HandID") )
+		{
+			int ID = int.Parse( msg.GetMessage("HandID") );
+			if ( leftHandGroup.GetHandByID(ID) != null )
+				_lastIsLeft = true;
+			else
+				_lastIsLeft = false;
+		}
+		ShrinkHand( !_lastIsLeft);
+	}
 
 	public void OnTriggerable(EventDefine eventName, object sender, EventArgs args)
 	{
@@ -338,6 +353,7 @@ public class HeroBody : MonoBehaviour {
 		rightHandGroup.setForceType( tempForceType );
 	}
 		
+	bool _lastIsLeft;
 	public void OnMoveHand(EventDefine eventName, object sender, EventArgs args)
 	{
 		if ( healthType == HealthType.Dead && isDead )
@@ -346,6 +362,7 @@ public class HeroBody : MonoBehaviour {
 		MessageEventArgs msg = (MessageEventArgs)args;
 		float posX = transform.localPosition.x;
 		float posY = transform.localPosition.y ;
+		Vector3 pos = transform.position;
 		if ( !msg.ContainMessage("isLeft"))
 		{
 			Debug.Log("cannot find posX and posY");
@@ -355,6 +372,10 @@ public class HeroBody : MonoBehaviour {
 		{
 			posX = float.Parse( msg.GetMessage("posX"));
 			posY = float.Parse( msg.GetMessage("posY"));
+		}
+		if ( msg.ContainMessage( "mousePos" ) )
+		{
+			pos = Global.Str2V3( msg.GetMessage( "mousePos" ));
 		}
 		//strench left and shrink right if left is free
 		//else strench right and shrink left
@@ -369,8 +390,9 @@ public class HeroBody : MonoBehaviour {
 		if ( leftHandGroup.state != HandGroup.HandGroupState.Fly 
 		    && rightHandGroup.state != HandGroup.HandGroupState.Fly )
 		{
-			StrenchHandToward( posX , posY , isLeft );
-			ShrinkHand( !isLeft );
+			StrenchHandToward( pos.x , pos.y , isLeft );
+			_lastIsLeft = isLeft;
+			//ShrinkHand( !isLeft );
 		}
 
 

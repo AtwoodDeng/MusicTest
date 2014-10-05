@@ -57,6 +57,16 @@ public class BLevel : MonoBehaviour {
 
 		BEventManager.Instance.PostEvent( EventDefine.OnShowText , msg );
 	}
+
+	virtual public void showWord( string text , string pos/*, float showTime =2f , float disTime = 3f*/ ){
+		MessageEventArgs msg = new MessageEventArgs();
+		msg.AddMessage( "text" , text );
+		msg.AddMessage( "pos" , pos );
+//		msg.AddMessage("showTime" , showTime.ToString());
+//		msg.AddMessage("disappearTime" , disTime.ToString());
+		
+		BEventManager.Instance.PostEvent( EventDefine.OnShowWord , msg );
+	}
 	
 	virtual public void showTipsByKey( string key )
 	{
@@ -92,7 +102,8 @@ public class BLevel : MonoBehaviour {
 	public void OnTriggerable(EventDefine eventName, object sender, EventArgs args)
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
-		DealTrigger( msg.GetMessage(Global.TriggableMessage));
+		DealTrigger( msg.GetMessage(Global.TriggableMessage) );
+		DealTrigger( msg );
 	}
 
 	virtual public void DealTrigger( string msg )
@@ -114,6 +125,11 @@ public class BLevel : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	virtual public void DealTrigger( MessageEventArgs msg )
+	{
+
 	}
 
 	virtual public void DealWith( float deltaTime )
@@ -203,4 +219,5 @@ public class BLevel : MonoBehaviour {
 			BObjManager.Instance.BHeroBody.Heal();
 		}
 	}
+
 }

@@ -35,6 +35,10 @@ public class Shine : MonoBehaviour {
 	public LoopType angleLoopType = LoopType.Yoyo;
 	public LoopType posLoopType = LoopType.Yoyo;
 
+	public int scaleLoopTime = 999;
+	public int angleLoopTime = 999;
+	public int posLoopTime = 999;
+
 	// Use this for initialization
 	void Awake () {
 		oriScale = transform.localScale;
@@ -64,7 +68,7 @@ public class Shine : MonoBehaviour {
 		           );
 	}
 
-	void DoShine() {
+	public void DoShine() {
 		if ( isEnter )
 		{
 			DoEnter();
@@ -79,7 +83,7 @@ public class Shine : MonoBehaviour {
 			           .Prop("localScale" 
 			      		, oriScale * maxScale)
 			           .Ease(scaleEaseType)
-			           .Loops( 999 , scaleLoopType )
+			           .Loops( scaleLoopTime , scaleLoopType )
 			           .Delay( ScaleDelay )
 			           );
 		
@@ -90,7 +94,7 @@ public class Shine : MonoBehaviour {
 			      		, new Vector3( 0 , 0 , MaxAngle )
 			      		, true)
 			           .Ease(angleEaseType)
-			           .Loops( 999 , angleLoopType )
+			           .Loops( angleLoopTime , angleLoopType )
 			           .Delay( AngleDelay ) );
 
 			HOTween.To( transform 
@@ -100,7 +104,7 @@ public class Shine : MonoBehaviour {
 			     	 	, MaxPos 
 			      		, true )
 			           .Ease(posEaseType)
-			           .Loops( 999 , posLoopType )
+			           .Loops( posLoopTime , posLoopType )
 			           .Delay( PosDelay )
 			           );
 			
