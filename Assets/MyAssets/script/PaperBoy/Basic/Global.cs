@@ -86,6 +86,10 @@ public static class Global {
 		{"CrowLevel2" , "CrowLevel3"},
 		{"CrowLevel3" , "CrowLevel4"},
 		{"CrowLevel4" , "CrowLevel0"},
+		{"CrowLevel5" , "CrowLevel0"},
+		{"CrowLevel6" , "CrowLevel0"},
+		{"CrowLevel7" , "CrowLevel0"},
+		{"CrowLevel8" , "CrowLevel0"},
 		{"level0" , "KafakaLv0_2"}};
 
 	public static string ScreenCloudPath = "Tool/Prefab/ScreenCloud";
@@ -159,6 +163,7 @@ public static class Global {
 
 	public static string RECOVER_POINT_TAG = "RECOVER_POINT";
 	public static string RECOVER_MSG = "RecoverPoint";
+	public static string OUT_OF_RANGE = "out_of_range";
 
 	public static float DEAD_START_TIME = 0.33f;
 	
@@ -182,7 +187,7 @@ public static class Global {
 
 	public static int HIS_SHOW_NUMBER = 5;
 
-	public static string MouseBackClickEffectPath = "Effect/Hero/DotSmall";
+	public static string MouseBackClickEffectPath = "Effect/Hero/DropMouse";
 
 	public static float adjustAngle( float _angle)
 	{

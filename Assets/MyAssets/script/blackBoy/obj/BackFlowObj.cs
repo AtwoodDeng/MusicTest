@@ -38,7 +38,7 @@ public class BackFlowObj : MonoBehaviour {
 		BackClick( args );
 	}
 
-	public void BackClick(EventArgs args)
+	virtual public void BackClick(EventArgs args)
 	{
 		MessageEventArgs msg = (MessageEventArgs)args;
 		Vector3 ClickPos = Global.Str2V3( msg.GetMessage( "globalPos" ));
@@ -57,7 +57,7 @@ public class BackFlowObj : MonoBehaviour {
 		Refresh();
 	}
 
-	public void Init(){
+	virtual public void Init(){
 
 		if (sprite == null )
 			sprite = gameObject.GetComponent<tk2dSprite>();
@@ -82,7 +82,7 @@ public class BackFlowObj : MonoBehaviour {
 		timeOffset = UnityEngine.Random.Range( -10f , 10f);
 		transform.Rotate( new Vector3( 0 , 0 , UnityEngine.Random.Range( 0 , 360f )));
 	}
-	public void Refresh() {
+	virtual public void Refresh() {
 		//active
 		gameObject.SetActive( true );
 
@@ -110,8 +110,14 @@ public class BackFlowObj : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		UpdateForce();
+	}
+
+	protected virtual void UpdateForce()
+	{
 		rigidbody.AddForce( getRandomDir() * forceIntense * Mathf.Sin(Time.time * 2 * Mathf.PI / timeRange + timeOffset) , ForceMode.Force );
 		rigidbody.AddTorque( getRandomTorque() * TorqueIntense * Mathf.Sin(Time.time * 2 * Mathf.PI / timeRange + timeOffset) , ForceMode.Force );
+
 	}
 
 	void OnBecameInvisible(){

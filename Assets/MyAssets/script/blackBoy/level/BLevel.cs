@@ -7,6 +7,7 @@ public class BLevel : MonoBehaviour {
 	public string levelName;
 	public GameObject startPoint;
 	public GameObject RecoverPoint;
+	public float endTime = 2f;
 
 	public float time = 0;
 
@@ -158,13 +159,15 @@ public class BLevel : MonoBehaviour {
 		}
 	}
 
-	public void OnEnd( float endTime )
+	public void OnEnd( float _endTime = -1f )
 	{
+		if ( _endTime == -1f )
+			_endTime = endTime;
 		GameObject endPre = Resources.Load( Global.EndPointEffect ) as GameObject;
 		GameObject end = Instantiate( endPre ) as GameObject;
 		end.transform.parent = BObjManager.Instance.Effect.transform;
 
-		Invoke( "OnEndFinal" , endTime );
+		 Invoke( "OnEndFinal" , _endTime );
 	}
 
 	public void OnEndFinal()

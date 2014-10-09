@@ -113,6 +113,8 @@ public class HeroHand : MonoBehaviour {
 	public string catchSpriteName;
 	public float bodyAngleAdjustRate = 0.5f;
 
+	public AudioSource hitSound;
+
 	// Use this for initialization
 	void Start () {
 		ID = getID();
@@ -332,6 +334,9 @@ public class HeroHand : MonoBehaviour {
 				msg.AddMessage( "CatchPositionGlobal" , Global.V32Str( pos ) );
 			}
 			BEventManager.Instance.PostEvent( EventDefine.OnCatch , msg );
+
+			//play sound effect
+			hitSound.Play();
 
 			//change sprite
 			sprite.SetSprite( catchSpriteName );

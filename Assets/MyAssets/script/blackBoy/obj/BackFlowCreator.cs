@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System;
 
 public class BackFlowCreator : MonoBehaviour {
-
-
+	
 	public int maxObj = 200;
 	public List<BackFlowObj> flowList = new List<BackFlowObj>();
 	public List<BackFlowObj> disactList = new List<BackFlowObj>();
@@ -16,7 +15,7 @@ public class BackFlowCreator : MonoBehaviour {
 	public int createBuffIncrease = 3;
 	public int createCount = 1;
 	public int initCount = 100;
-	public int maxDealClick = 200;
+//	public int maxDealClick = 200;
 
 	// Use this for initialization
 	void Awake() {
